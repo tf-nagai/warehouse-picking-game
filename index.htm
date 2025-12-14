@@ -163,23 +163,27 @@
         .urgent-btns {
             display: none;
             position: fixed;
-            top: 55%;
+            top: 58%;
             left: 50%;
             transform: translateX(-50%);
-            gap: clamp(10px, 3vw, 30px);
+            gap: clamp(15px, 4vw, 40px);
             z-index: 200;
             flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 90vw;
         }
         
         .urgent-choice-btn {
-            padding: clamp(12px, 3vw, 20px) clamp(20px, 5vw, 35px);
-            font-size: clamp(14px, 2.5vw, 20px);
+            padding: clamp(15px, 3vw, 22px) clamp(25px, 6vw, 45px);
+            font-size: clamp(16px, 2.5vw, 22px);
             font-weight: bold;
             border: none;
             border-radius: 12px;
             cursor: pointer;
             touch-action: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            white-space: nowrap;
         }
         
         .accept-btn {
@@ -188,10 +192,20 @@
             border: 3px solid #FF8A80;
         }
         
+        .accept-btn:hover, .accept-btn:active {
+            background: linear-gradient(145deg, #FF6B6B, #E53935);
+            transform: scale(1.02);
+        }
+        
         .reject-btn {
             background: linear-gradient(145deg, #666, #444);
             color: white;
             border: 3px solid #888;
+        }
+        
+        .reject-btn:hover, .reject-btn:active {
+            background: linear-gradient(145deg, #777, #555);
+            transform: scale(1.02);
         }
         
         /* スタートボタン */
@@ -278,7 +292,7 @@
                 bottom: calc(min(25vw, 150px) + 20px);
             }
             .urgent-btns {
-                top: 45%;
+                top: 55%;
             }
         }
         
@@ -1873,9 +1887,9 @@
             if (!urgent) return;
             
             const panelW = 600;
-            const panelH = 320;
+            const panelH = 260;
             const panelX = SCREEN_WIDTH/2 - panelW/2;
-            const panelY = 180;
+            const panelY = 140;
             
             ctx.fillStyle = 'rgba(150, 30, 30, 0.95)';
             ctx.fillRect(panelX, panelY, panelW, panelH);
@@ -1885,46 +1899,41 @@
             
             // タイトル
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 34px sans-serif';
+            ctx.font = 'bold 32px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('🚨 緊急オーダー割り込み！', SCREEN_WIDTH/2, panelY + 45);
+            ctx.fillText('🚨 緊急オーダー割り込み！', SCREEN_WIDTH/2, panelY + 40);
             
             // 締切カウントダウン
             ctx.fillStyle = '#FFD700';
-            ctx.font = 'bold 24px sans-serif';
-            ctx.fillText(`選択まで残り ${Math.ceil(urgent.deadline)}秒`, SCREEN_WIDTH/2, panelY + 80);
+            ctx.font = 'bold 22px sans-serif';
+            ctx.fillText(`選択まで残り ${Math.ceil(urgent.deadline)}秒`, SCREEN_WIDTH/2, panelY + 72);
             
             // アイテムリスト
-            const itemStartX = SCREEN_WIDTH/2 - (urgent.items.length * 45);
+            const itemStartX = SCREEN_WIDTH/2 - (urgent.items.length * 50);
             urgent.items.forEach((item, i) => {
                 const type = ITEM_TYPES[item.type];
-                const ix = itemStartX + i * 90;
+                const ix = itemStartX + i * 100;
                 
                 ctx.fillStyle = type.color;
                 ctx.beginPath();
-                ctx.arc(ix + 40, panelY + 140, 38, 0, Math.PI * 2);
+                ctx.arc(ix + 50, panelY + 130, 40, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.strokeStyle = '#fff';
                 ctx.lineWidth = 3;
                 ctx.stroke();
-                ctx.font = '40px sans-serif';
-                ctx.fillText(type.emoji, ix + 40, panelY + 155);
+                ctx.font = '42px sans-serif';
+                ctx.fillText(type.emoji, ix + 50, panelY + 145);
                 ctx.font = 'bold 20px sans-serif';
                 ctx.fillStyle = '#fff';
-                ctx.fillText(`×${item.required}`, ix + 40, panelY + 195);
+                ctx.fillText(`×${item.required}`, ix + 50, panelY + 190);
             });
             
-            // 説明テキスト
+            // 説明テキスト（パネル内に収める）
             ctx.fillStyle = '#4CAF50';
-            ctx.font = 'bold 16px sans-serif';
-            ctx.fillText('Y：受ける → 高得点 ＆ 時間+10秒', SCREEN_WIDTH/2, panelY + 250);
+            ctx.font = 'bold 15px sans-serif';
+            ctx.fillText('Y：受ける → 高得点 ＆ 時間+10秒', SCREEN_WIDTH/2, panelY + 230);
             ctx.fillStyle = '#aaa';
-            ctx.fillText('N：無視 → 現オーダー続行（-5秒）', SCREEN_WIDTH/2, panelY + 275);
-            
-            // 補足
-            ctx.fillStyle = '#888';
-            ctx.font = '14px sans-serif';
-            ctx.fillText('※ 時間切れで自動的に「無視」になります', SCREEN_WIDTH/2, panelY + 305);
+            ctx.fillText('N：無視 → 現オーダー続行（-5秒）', SCREEN_WIDTH/2, panelY + 250);
         }
 
         function drawMinimap() {
