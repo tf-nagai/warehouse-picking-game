@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>倉庫ピッキングゲーム Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Hiragino Sans', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+        
+        h1 {
+            color: #ffd700;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        #gameCanvas {
+            border: 3px solid #ffd700;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            cursor: pointer;
+            outline: none;
+            max-width: 100%;
+            max-height: 55vh;
+        }
+        
+        .controls {
+            color: #ccc;
+            font-size: 11px;
+            text-align: center;
+        }
+        
+        .controls span {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .virtual-controls {
+            display: none;
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            padding: 0 15px;
+        }
+        
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dpad {
+            position: relative;
+            width: 130px;
+            height: 130px;
+        }
+        
+        .dpad-btn {
+            position: absolute;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 215, 0, 0.7);
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #1a1a2e;
+            font-weight: bold;
+            touch-action: none;
+        }
+        
+        .dpad-btn:active, .dpad-btn.active {
+            background: #ffd700;
+            transform: scale(0.95);
+        }
+        
+        .dpad-up { top: 0; left: 50%; transform: translateX(-50%); }
+        .dpad-down { bottom: 0; left: 50%; transform: translateX(-50%); }
+        .dpad-left { left: 0; top: 50%; transform: translateY(-50%); }
+        .dpad-right { right: 0; top: 50%; transform: translateY(-50%); }
+        
+        .dpad-up:active, .dpad-up.active { transform: translateX(-50%) scale(0.95); }
+        .dpad-down:active, .dpad-down.active { transform: translateX(-50%) scale(0.95); }
+        .dpad-left:active, .dpad-left.active { transform: translateY(-50%) scale(0.95); }
+        .dpad-right:active, .dpad-right.active { transform: translateY(-50%) scale(0.95); }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #4CAF50, #2E7D32);
+            border: 3px solid #81C784;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+            touch-action: none;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .action-btn:active, .action-btn.active {
+            transform: scale(0.95);
+        }
+        
+        .urgent-btns {
+            display: none;
+            position: fixed;
+            bottom: 50%;
+            left: 50%;
+            transform: translate(-50%, 50%);
+            gap: 20px;
+            z-index: 200;
+        }
+        
+        .urgent-choice-btn {
+            padding: 20px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            touch-action: none;
+        }
+        
+        .accept-btn {
+            background: #FF5252;
+            color: white;
+        }
+        
+        .reject-btn {
+            background: #666;
+            color: white;
+        }
+        
+        .start-btn {
+            position: fixed;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 40px;
+            background: #ffd700;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a1a2e;
+            display: none;
+            touch-action: none;
+        }
+        
+        .sound-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            background: rgba(255, 215, 0, 0.8);
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 100;
+        }
+        
+        @media (max-width: 950px) {
+            .virtual-controls, .start-btn {
+                display: flex;
+            }
+            .controls {
+                display: none;
+            }
+            h1 {
+                font-size: 16px;
+            }
+            #gameCanvas {
+                max-height: 45vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🏭 倉庫ピッキング Pro</h1>
+        <canvas id="gameCanvas" tabindex="0"></canvas>
+        <div class="controls">
+            <span>↑↓←→/WASD</span>移動 | <span>SPACE</span>ピック/納品 | <span>M</span>BGM | 緊急時<span>Y/N</span>で選択
+        </div>
+    </div>
+    
+    <button class="sound-toggle" id="soundToggle">🔊</button>
+    <button class="start-btn" id="startBtn">🎮 スタート</button>
+    
+    <div class="urgent-btns" id="urgentBtns">
+        <button class="urgent-choice-btn accept-btn" id="acceptBtn">🚨 緊急を受ける (Y)</button>
+        <button class="urgent-choice-btn reject-btn" id="rejectBtn">続行する (N)</button>
+    </div>
+    
+    <div class="virtual-controls" id="virtualControls">
+        <div class="control-row">
+            <div class="dpad">
+                <div class="dpad-btn dpad-up" data-dir="up">▲</div>
+                <div class="dpad-btn dpad-down" data-dir="down">▼</div>
+                <div class="dpad-btn dpad-left" data-dir="left">◀</div>
+                <div class="dpad-btn dpad-right" data-dir="right">▶</div>
+            </div>
+            <div class="action-buttons">
+                <div class="action-btn" id="actionBtn">📦<br>ピック</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('startBtn');
+        const soundToggle = document.getElementById('soundToggle');
+        const actionBtn = document.getElementById('actionBtn');
+        const urgentBtns = document.getElementById('urgentBtns');
+        const acceptBtn = document.getElementById('acceptBtn');
+        const rejectBtn = document.getElementById('rejectBtn');
+
+        // 画面・マップサイズ
+        const SCREEN_WIDTH = 950;
+        const SCREEN_HEIGHT = 600;
+        const MAP_WIDTH = 1900;
+        const MAP_HEIGHT = 1500;
+        
+        canvas.width = SCREEN_WIDTH;
+        canvas.height = SCREEN_HEIGHT;
+
+        // アイテムの種類
+        const ITEM_TYPES = [
+            { emoji: '👒', name: '帽子', color: '#FFE4B5' },
+            { emoji: '👕', name: 'シャツ', color: '#87CEEB' },
+            { emoji: '👖', name: 'ズボン', color: '#4169E1' },
+            { emoji: '🧦', name: '靴下', color: '#FFF0F5' },
+            { emoji: '👟', name: '靴', color: '#DEB887' },
+            { emoji: '🌂', name: '傘', color: '#9370DB' },
+            { emoji: '👜', name: 'バッグ', color: '#F4A460' }
+        ];
+
+        // ゲーム状態
+        const GAME_STATE = { TITLE: 0, PLAYING: 1, GAMEOVER: 2, URGENT_CHOICE: 3 };
+        const ORDER_TYPE = { NORMAL: 0, URGENT: 1 };
+
+        // ゲームオブジェクト
+        let game = {
+            state: GAME_STATE.TITLE,
+            score: 0,
+            timeLeft: 60,
+            currentOrder: null,
+            pendingUrgent: null,     // 割り込み待ちの緊急オーダー
+            urgentTimer: 0,          // 次の緊急発生までの時間
+            completedOrders: 0,
+            urgentCompleted: 0,
+            urgentMissed: 0,
+            level: 1,
+            shelves: [],
+            forklifts: [],
+            shippingStation: null,
+            cameraX: 0,
+            cameraY: 0,
+            lastTime: 0,
+            bgmEnabled: true,
+            hitCooldown: 0,
+            eventLog: [],
+            flashEffect: null,
+            telopText: null,
+            telopTimer: 0,
+            comboCount: 0,
+            lastOrderTime: 0
+        };
+
+        // プレイヤー
+        let player = {
+            x: MAP_WIDTH / 2,
+            y: MAP_HEIGHT - 200,
+            width: 40,
+            height: 50,
+            speed: 5,
+            direction: 'up',
+            animFrame: 0,
+            animTimer: 0,
+            isPicking: false,
+            pickTimer: 0,
+            pickTarget: null,
+            inventory: []
+        };
+
+        // 入力状態
+        let keys = {};
+        let touchDirs = { up: false, down: false, left: false, right: false };
+
+        // ============================================
+        // オーディオシステム
+        // ============================================
+        
+        let audioCtx = null;
+        let bgmInterval = null;
+        let bgmPlaying = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        const BGM_MELODY = [
+            { note: 'C5', dur: 0.12 }, { note: 'E5', dur: 0.12 }, 
+            { note: 'G5', dur: 0.12 }, { note: 'C6', dur: 0.24 },
+            { note: 'G5', dur: 0.12 }, { note: 'E5', dur: 0.12 },
+            { note: 'C5', dur: 0.12 }, { note: 'D5', dur: 0.12 },
+            { note: 'F5', dur: 0.12 }, { note: 'A5', dur: 0.12 },
+            { note: 'D6', dur: 0.24 }, { note: 'A5', dur: 0.12 },
+            { note: 'F5', dur: 0.12 }, { note: 'D5', dur: 0.12 },
+            { note: 'E5', dur: 0.12 }, { note: 'G5', dur: 0.12 },
+            { note: 'B5', dur: 0.12 }, { note: 'E6', dur: 0.24 },
+            { note: 'D6', dur: 0.12 }, { note: 'C6', dur: 0.24 },
+            { note: null, dur: 0.12 }
+        ];
+
+        const NOTE_FREQ = {
+            'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
+            'C5': 523.25, 'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77,
+            'C6': 1046.50, 'D6': 1174.66, 'E6': 1318.51
+        };
+
+        function startBGM() {
+            if (!audioCtx || !game.bgmEnabled || bgmPlaying) return;
+            bgmPlaying = true;
+            
+            let noteIndex = 0;
+            let nextNoteTime = audioCtx.currentTime;
+
+            function scheduleNotes() {
+                while (nextNoteTime < audioCtx.currentTime + 0.2) {
+                    const { note, dur } = BGM_MELODY[noteIndex];
+                    if (note && NOTE_FREQ[note]) {
+                        playBGMNote(NOTE_FREQ[note], dur * 0.9, nextNoteTime);
+                    }
+                    nextNoteTime += dur;
+                    noteIndex = (noteIndex + 1) % BGM_MELODY.length;
+                }
+            }
+
+            bgmInterval = setInterval(() => {
+                if (game.state === GAME_STATE.PLAYING && game.bgmEnabled) {
+                    scheduleNotes();
+                }
+            }, 100);
+        }
+
+        function playBGMNote(freq, duration, time) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, time);
+            gain.gain.setValueAtTime(0.04, time);
+            gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
+            osc.start(time);
+            osc.stop(time + duration);
+        }
+
+        function stopBGM() {
+            if (bgmInterval) { clearInterval(bgmInterval); bgmInterval = null; }
+            bgmPlaying = false;
+        }
+
+        function toggleBGM() {
+            game.bgmEnabled = !game.bgmEnabled;
+            soundToggle.textContent = game.bgmEnabled ? '🔊' : '🔇';
+            if (!game.bgmEnabled) stopBGM();
+            else if (game.state === GAME_STATE.PLAYING) startBGM();
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            switch (type) {
+                case 'pick':
+                    playNote(600, 0.05, 'sine', 0);
+                    playNote(800, 0.08, 'sine', 0.05);
+                    playNote(1000, 0.1, 'sine', 0.12);
+                    break;
+                case 'complete':
+                    playNote(523, 0.08, 'sine', 0);
+                    playNote(659, 0.08, 'sine', 0.08);
+                    playNote(784, 0.08, 'sine', 0.16);
+                    playNote(1047, 0.15, 'sine', 0.24);
+                    playNote(784, 0.08, 'sine', 0.4);
+                    playNote(1047, 0.25, 'sine', 0.48);
+                    break;
+                case 'ship':
+                    playNote(880, 0.1, 'sine', 0);
+                    playNote(1100, 0.1, 'sine', 0.1);
+                    playNote(1320, 0.1, 'sine', 0.2);
+                    playNote(1760, 0.3, 'sine', 0.3);
+                    break;
+                case 'levelup':
+                    playNote(523, 0.08, 'square', 0);
+                    playNote(659, 0.08, 'square', 0.08);
+                    playNote(784, 0.08, 'square', 0.16);
+                    playNote(1047, 0.12, 'square', 0.24);
+                    playNote(1318, 0.12, 'square', 0.36);
+                    playNote(1568, 0.25, 'square', 0.48);
+                    break;
+                case 'wrong':
+                    playNote(200, 0.12, 'sawtooth', 0, 0.1);
+                    playNote(150, 0.15, 'sawtooth', 0.1, 0.1);
+                    break;
+                case 'hit':
+                    playNote(120, 0.08, 'sawtooth', 0, 0.15);
+                    playNote(80, 0.15, 'sawtooth', 0.08, 0.15);
+                    playNote(60, 0.2, 'sawtooth', 0.2, 0.1);
+                    break;
+                case 'urgent':
+                    // 緊急アラーム音
+                    for (let i = 0; i < 3; i++) {
+                        playNote(880, 0.1, 'square', i * 0.25, 0.12);
+                        playNote(660, 0.1, 'square', i * 0.25 + 0.12, 0.12);
+                    }
+                    break;
+                case 'urgentAccept':
+                    playNote(440, 0.1, 'sine', 0);
+                    playNote(660, 0.1, 'sine', 0.1);
+                    playNote(880, 0.15, 'sine', 0.2);
+                    break;
+                case 'urgentMiss':
+                    playNote(300, 0.15, 'sawtooth', 0, 0.1);
+                    playNote(200, 0.2, 'sawtooth', 0.15, 0.1);
+                    playNote(150, 0.3, 'sawtooth', 0.35, 0.08);
+                    break;
+                case 'gameover':
+                    playNote(400, 0.2, 'sine', 0);
+                    playNote(350, 0.2, 'sine', 0.2);
+                    playNote(300, 0.2, 'sine', 0.4);
+                    playNote(250, 0.4, 'sine', 0.6);
+                    break;
+            }
+        }
+
+        function playNote(freq, duration, waveType, delay, volume = 0.12) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = waveType;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime + delay);
+            gain.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + delay + 0.01);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + delay + duration);
+            osc.start(audioCtx.currentTime + delay);
+            osc.stop(audioCtx.currentTime + delay + duration + 0.01);
+        }
+
+        // ============================================
+        // イベントログ・演出
+        // ============================================
+
+        function addEventLog(text, type = 'info') {
+            game.eventLog.unshift({ text, type, time: 3.5 });
+            if (game.eventLog.length > 6) game.eventLog.pop();
+        }
+
+        function showTelop(text, duration = 2) {
+            game.telopText = text;
+            game.telopTimer = duration;
+        }
+
+        function triggerFlash(color, duration = 0.3) {
+            game.flashEffect = { color, duration, timer: duration };
+        }
+
+        // ============================================
+        // マップ生成
+        // ============================================
+        
+        function generateMap() {
+            game.shelves = [];
+            game.forklifts = [];
+
+            const shelfWidth = 100;
+            const shelfHeight = 70;
+            const gapX = 260;
+            const gapY = 220;
+            const startX = 150;
+            const startY = 180;
+
+            const rows = 4;
+            const cols = 6;
+
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const x = startX + col * gapX;
+                    const y = startY + row * gapY;
+                    const typeIndex = (row * cols + col) % ITEM_TYPES.length;
+                    
+                    game.shelves.push({
+                        x, y,
+                        width: shelfWidth,
+                        height: shelfHeight,
+                        itemType: typeIndex,
+                        stock: 99
+                    });
+                }
+            }
+
+            // 出荷ステーション
+            game.shippingStation = {
+                x: MAP_WIDTH / 2 - 80,
+                y: MAP_HEIGHT - 120,
+                width: 160,
+                height: 80
+            };
+
+            createForklifts();
+        }
+
+        function createForklifts() {
+            game.forklifts = [];
+            const forkliftCount = Math.min(2 + Math.floor(game.level / 2), 8);
+            
+            const routes = [
+                { startX: 80, startY: 280, endX: MAP_WIDTH - 120, endY: 280, dir: 'h' },
+                { startX: 80, startY: 500, endX: MAP_WIDTH - 120, endY: 500, dir: 'h' },
+                { startX: 80, startY: 720, endX: MAP_WIDTH - 120, endY: 720, dir: 'h' },
+                { startX: 80, startY: 940, endX: MAP_WIDTH - 120, endY: 940, dir: 'h' },
+                { startX: 350, startY: 130, endX: 350, endY: MAP_HEIGHT - 180, dir: 'v' },
+                { startX: 750, startY: 130, endX: 750, endY: MAP_HEIGHT - 180, dir: 'v' },
+                { startX: 1150, startY: 130, endX: 1150, endY: MAP_HEIGHT - 180, dir: 'v' },
+                { startX: 1550, startY: 130, endX: 1550, endY: MAP_HEIGHT - 180, dir: 'v' }
+            ];
+
+            for (let i = 0; i < forkliftCount; i++) {
+                const route = routes[i % routes.length];
+                const baseSpeed = 1.8 + game.level * 0.2;
+                game.forklifts.push({
+                    x: route.dir === 'h' ? route.startX + Math.random() * 300 : route.startX,
+                    y: route.dir === 'v' ? route.startY + Math.random() * 300 : route.startY,
+                    width: 45,
+                    height: 65,
+                    speed: baseSpeed + Math.random() * 0.5,
+                    direction: Math.random() < 0.5 ? 1 : -1,
+                    route
+                });
+            }
+        }
+
+        // ============================================
+        // オーダー管理
+        // ============================================
+
+        function createOrder(type) {
+            const isUrgent = type === ORDER_TYPE.URGENT;
+            const itemCount = isUrgent 
+                ? 2 + Math.floor(game.level / 4) 
+                : 3 + Math.floor(game.level / 3);
+            const deadline = isUrgent 
+                ? 12 + Math.floor(Math.random() * 8)  // 12〜20秒
+                : 25 + Math.floor(Math.random() * 15); // 25〜40秒
+            const basePoints = isUrgent ? 2500 : 1000;
+            
+            const usedTypes = new Set();
+            const items = [];
+            
+            for (let i = 0; i < Math.min(itemCount, 5); i++) {
+                let typeIndex;
+                do {
+                    typeIndex = Math.floor(Math.random() * ITEM_TYPES.length);
+                } while (usedTypes.has(typeIndex));
+                usedTypes.add(typeIndex);
+                
+                const required = isUrgent ? 1 : 1 + Math.floor(Math.random() * 2);
+                items.push({ type: typeIndex, required, collected: 0 });
+            }
+            
+            return {
+                id: Date.now() + Math.random(),
+                type,
+                items,
+                deadline,
+                maxDeadline: deadline,
+                basePoints,
+                readyToShip: false
+            };
+        }
+
+        function startNewOrder() {
+            game.currentOrder = createOrder(ORDER_TYPE.NORMAL);
+            player.inventory = [];
+            addEventLog('📋 新規オーダー受付', 'info');
+        }
+
+        function triggerUrgentOrder() {
+            // 緊急オーダー割り込み！
+            game.pendingUrgent = createOrder(ORDER_TYPE.URGENT);
+            game.state = GAME_STATE.URGENT_CHOICE;
+            playSound('urgent');
+            triggerFlash('rgba(255, 0, 0, 0.4)', 0.5);
+            showTelop('🚨 緊急オーダー割り込み！', 1);
+            addEventLog('🚨 緊急オーダー発生！', 'urgent');
+            
+            // スマホ用ボタン表示
+            urgentBtns.style.display = 'flex';
+        }
+
+        function acceptUrgent() {
+            // 緊急を受ける → 今のオーダーは破棄
+            addEventLog('⚡ 緊急オーダー受諾！', 'urgent');
+            game.currentOrder = game.pendingUrgent;
+            game.pendingUrgent = null;
+            player.inventory = [];
+            game.state = GAME_STATE.PLAYING;
+            urgentBtns.style.display = 'none';
+            playSound('urgentAccept');
+            showTelop('🔴 緊急オーダー開始！', 1.5);
+            
+            // 次の緊急までの時間をリセット
+            resetUrgentTimer();
+        }
+
+        function rejectUrgent() {
+            // 緊急を無視 → ペナルティ
+            addEventLog('❌ 緊急オーダー拒否 -5秒', 'danger');
+            game.timeLeft -= 5;
+            game.urgentMissed++;
+            game.pendingUrgent = null;
+            game.state = GAME_STATE.PLAYING;
+            urgentBtns.style.display = 'none';
+            playSound('urgentMiss');
+            triggerFlash('rgba(255, 100, 0, 0.4)', 0.3);
+            showTelop('⏭ オーダー続行 (-5秒)', 1);
+            
+            // 次の緊急までの時間をリセット
+            resetUrgentTimer();
+        }
+
+        function resetUrgentTimer() {
+            // レベルに応じて緊急の頻度が上がる
+            const minTime = Math.max(12, 25 - game.level * 2);
+            const maxTime = Math.max(20, 40 - game.level * 3);
+            game.urgentTimer = minTime + Math.random() * (maxTime - minTime);
+        }
+
+        // ============================================
+        // ピッキング処理
+        // ============================================
+
+        function tryPick() {
+            if (player.isPicking || game.state !== GAME_STATE.PLAYING) return;
+            
+            // 出荷ステーションにいる場合は納品処理
+            if (isNearShippingStation()) {
+                tryShip();
+                return;
+            }
+            
+            // 近くの棚を探す
+            const nearShelf = findNearShelf();
+            if (!nearShelf) {
+                addEventLog('棚が近くにありません', 'warning');
+                return;
+            }
+            
+            const order = game.currentOrder;
+            if (!order || order.readyToShip) {
+                addEventLog('納品待ちです → 出荷口へ', 'warning');
+                return;
+            }
+            
+            const neededItem = order.items.find(item => 
+                item.type === nearShelf.itemType && item.collected < item.required
+            );
+            
+            if (!neededItem) {
+                playSound('wrong');
+                addEventLog('❌ 誤ピック！不要なアイテム', 'error');
+                triggerFlash('rgba(255, 100, 0, 0.4)', 0.2);
+                return;
+            }
+            
+            // ピッキング開始
+            player.isPicking = true;
+            player.pickTimer = 0.35;
+            player.pickTarget = nearShelf;
+            
+            setTimeout(() => {
+                if (player.isPicking && player.pickTarget === nearShelf) {
+                    neededItem.collected++;
+                    player.inventory.push({ type: nearShelf.itemType, orderId: order.id });
+                    
+                    const isUrgent = order.type === ORDER_TYPE.URGENT;
+                    const points = (isUrgent ? 100 : 50) * game.level;
+                    game.score += points;
+                    
+                    playSound('pick');
+                    addEventLog(`✓ ${ITEM_TYPES[nearShelf.itemType].emoji} +${points}`, 'success');
+                    
+                    // オーダー完了チェック
+                    const allPicked = order.items.every(item => item.collected >= item.required);
+                    if (allPicked) {
+                        order.readyToShip = true;
+                        playSound('complete');
+                        showTelop('📦 ピック完了！出荷口へ！', 2);
+                        addEventLog('✅ ピック完了 → 出荷口へ', 'success');
+                    }
+                }
+                player.isPicking = false;
+                player.pickTarget = null;
+            }, 350);
+        }
+
+        function findNearShelf() {
+            const px = player.x + player.width / 2;
+            const py = player.y + player.height / 2;
+            
+            for (let shelf of game.shelves) {
+                const sx = shelf.x + shelf.width / 2;
+                const sy = shelf.y + shelf.height / 2;
+                const dist = Math.sqrt((px - sx) ** 2 + (py - sy) ** 2);
+                if (dist < 80) return shelf;
+            }
+            return null;
+        }
+
+        function isNearShippingStation() {
+            const station = game.shippingStation;
+            const px = player.x + player.width / 2;
+            const py = player.y + player.height / 2;
+            const sx = station.x + station.width / 2;
+            const sy = station.y + station.height / 2;
+            return Math.abs(px - sx) < 100 && Math.abs(py - sy) < 80;
+        }
+
+        function tryShip() {
+            const order = game.currentOrder;
+            if (!order || !order.readyToShip) {
+                addEventLog('納品するオーダーがありません', 'warning');
+                return;
+            }
+            
+            const isUrgent = order.type === ORDER_TYPE.URGENT;
+            const timeBonus = Math.max(0, Math.ceil(order.deadline));
+            const points = (order.basePoints + timeBonus * 100) * game.level;
+            
+            // コンボボーナス
+            const now = Date.now();
+            if (now - game.lastOrderTime < 15000) {
+                game.comboCount++;
+            } else {
+                game.comboCount = 1;
+            }
+            game.lastOrderTime = now;
+            
+            const comboBonus = game.comboCount > 1 ? Math.floor(points * (game.comboCount - 1) * 0.1) : 0;
+            const totalPoints = points + comboBonus;
+            
+            game.score += totalPoints;
+            game.completedOrders++;
+            if (isUrgent) game.urgentCompleted++;
+            
+            playSound('ship');
+            triggerFlash('rgba(0, 255, 100, 0.3)', 0.3);
+            
+            let msg = `🚚 出荷完了！+${totalPoints.toLocaleString()}`;
+            if (game.comboCount > 1) msg += ` (${game.comboCount}コンボ!)`;
+            showTelop(msg, 2);
+            addEventLog(msg, 'success');
+            
+            player.inventory = [];
+            
+            // ボーナス時間
+            game.timeLeft += isUrgent ? 10 : 6;
+            
+            // レベルアップチェック
+            const newLevel = Math.floor(game.completedOrders / 3) + 1;
+            if (newLevel > game.level) {
+                game.level = newLevel;
+                playSound('levelup');
+                showTelop(`⬆️ レベル ${game.level}！`, 2);
+                addEventLog(`🎉 レベルアップ！Lv.${game.level}`, 'levelup');
+                createForklifts();
+            }
+            
+            // 新しい通常オーダー開始
+            startNewOrder();
+        }
+
+        // ============================================
+        // フォークリフト
+        // ============================================
+
+        function updateForklifts(deltaTime) {
+            game.forklifts.forEach(fl => {
+                const route = fl.route;
+                if (route.dir === 'h') {
+                    fl.x += fl.speed * fl.direction;
+                    if (fl.x >= route.endX) fl.direction = -1;
+                    if (fl.x <= route.startX) fl.direction = 1;
+                } else {
+                    fl.y += fl.speed * fl.direction;
+                    if (fl.y >= route.endY) fl.direction = -1;
+                    if (fl.y <= route.startY) fl.direction = 1;
+                }
+            });
+        }
+
+        function checkForkliftCollision() {
+            if (game.hitCooldown > 0 || player.isPicking) return;
+
+            const playerRect = {
+                x: player.x + 5, y: player.y + 10,
+                width: player.width - 10, height: player.height - 10
+            };
+
+            for (let fl of game.forklifts) {
+                if (rectCollision(playerRect, fl)) {
+                    game.timeLeft -= 5;
+                    game.hitCooldown = 2;
+                    playSound('hit');
+                    triggerFlash('rgba(255, 0, 0, 0.5)', 0.4);
+                    showTelop('⚠️ ヒヤリハット発生！ -5秒', 1.5);
+                    addEventLog('⚠️ フォークリフト接触！-5秒', 'danger');
+                    
+                    const pushX = player.x - (fl.x + fl.width / 2);
+                    const pushY = player.y - (fl.y + fl.height / 2);
+                    const dist = Math.sqrt(pushX * pushX + pushY * pushY) || 1;
+                    player.x += (pushX / dist) * 60;
+                    player.y += (pushY / dist) * 60;
+                    player.x = Math.max(10, Math.min(MAP_WIDTH - player.width - 10, player.x));
+                    player.y = Math.max(100, Math.min(MAP_HEIGHT - player.height - 10, player.y));
+                    return;
+                }
+            }
+        }
+
+        // ============================================
+        // 衝突判定
+        // ============================================
+
+        function rectCollision(a, b) {
+            return a.x < b.x + b.width && a.x + a.width > b.x &&
+                   a.y < b.y + b.height && a.y + a.height > b.y;
+        }
+
+        function checkShelfCollision(newX, newY) {
+            const playerRect = {
+                x: newX + 8, y: newY + 20,
+                width: player.width - 16, height: player.height - 20
+            };
+            for (let shelf of game.shelves) {
+                if (rectCollision(playerRect, shelf)) return true;
+            }
+            return false;
+        }
+
+        // ============================================
+        // カメラ
+        // ============================================
+
+        function updateCamera() {
+            let targetX = player.x - SCREEN_WIDTH / 2 + player.width / 2;
+            let targetY = player.y - SCREEN_HEIGHT / 2 + player.height / 2;
+            targetX = Math.max(0, Math.min(MAP_WIDTH - SCREEN_WIDTH, targetX));
+            targetY = Math.max(0, Math.min(MAP_HEIGHT - SCREEN_HEIGHT, targetY));
+            game.cameraX += (targetX - game.cameraX) * 0.12;
+            game.cameraY += (targetY - game.cameraY) * 0.12;
+        }
+
+        // ============================================
+        // 入力
+        // ============================================
+
+        window.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+            
+            if (e.code === 'Space') {
+                canvas.focus();
+                initAudio();
+                if (game.state === GAME_STATE.PLAYING) {
+                    tryPick();
+                } else if (game.state === GAME_STATE.TITLE || game.state === GAME_STATE.GAMEOVER) {
+                    startGame();
+                }
+                e.preventDefault();
+            }
+            
+            // 緊急選択
+            if (game.state === GAME_STATE.URGENT_CHOICE) {
+                if (e.code === 'KeyY') {
+                    acceptUrgent();
+                    e.preventDefault();
+                } else if (e.code === 'KeyN') {
+                    rejectUrgent();
+                    e.preventDefault();
+                }
+            }
+            
+            if (e.code === 'KeyM') toggleBGM();
+            
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+                e.preventDefault();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+        // タッチ操作
+        document.querySelectorAll('.dpad-btn').forEach(btn => {
+            const dir = btn.dataset.dir;
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                touchDirs[dir] = true;
+                btn.classList.add('active');
+            });
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                touchDirs[dir] = false;
+                btn.classList.remove('active');
+            });
+            btn.addEventListener('touchcancel', () => {
+                touchDirs[dir] = false;
+                btn.classList.remove('active');
+            });
+        });
+
+        actionBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            initAudio();
+            if (game.state === GAME_STATE.PLAYING) tryPick();
+            actionBtn.classList.add('active');
+        });
+        actionBtn.addEventListener('touchend', () => actionBtn.classList.remove('active'));
+
+        acceptBtn.addEventListener('click', () => { if (game.state === GAME_STATE.URGENT_CHOICE) acceptUrgent(); });
+        rejectBtn.addEventListener('click', () => { if (game.state === GAME_STATE.URGENT_CHOICE) rejectUrgent(); });
+        acceptBtn.addEventListener('touchstart', (e) => { e.preventDefault(); if (game.state === GAME_STATE.URGENT_CHOICE) acceptUrgent(); });
+        rejectBtn.addEventListener('touchstart', (e) => { e.preventDefault(); if (game.state === GAME_STATE.URGENT_CHOICE) rejectUrgent(); });
+
+        startBtn.addEventListener('click', () => { initAudio(); if (game.state !== GAME_STATE.PLAYING) startGame(); });
+        startBtn.addEventListener('touchstart', (e) => { e.preventDefault(); initAudio(); if (game.state !== GAME_STATE.PLAYING) startGame(); });
+        soundToggle.addEventListener('click', () => { initAudio(); toggleBGM(); });
+        canvas.addEventListener('click', () => canvas.focus());
+
+        // ============================================
+        // ゲーム開始
+        // ============================================
+
+        function startGame() {
+            game.state = GAME_STATE.PLAYING;
+            game.score = 0;
+            game.timeLeft = 60;
+            game.completedOrders = 0;
+            game.urgentCompleted = 0;
+            game.urgentMissed = 0;
+            game.level = 1;
+            game.hitCooldown = 0;
+            game.eventLog = [];
+            game.flashEffect = null;
+            game.telopText = null;
+            game.comboCount = 0;
+            game.lastOrderTime = 0;
+            game.pendingUrgent = null;
+            
+            player.x = MAP_WIDTH / 2;
+            player.y = MAP_HEIGHT - 200;
+            player.inventory = [];
+            player.isPicking = false;
+            
+            generateMap();
+            startNewOrder();
+            resetUrgentTimer();
+            
+            game.cameraX = player.x - SCREEN_WIDTH / 2;
+            game.cameraY = player.y - SCREEN_HEIGHT / 2;
+            game.lastTime = performance.now();
+            
+            startBtn.style.display = 'none';
+            urgentBtns.style.display = 'none';
+            startBGM();
+            
+            addEventLog('🎮 ゲームスタート！', 'info');
+            showTelop('ピッキング開始！', 1.5);
+        }
+
+        // ============================================
+        // 更新
+        // ============================================
+
+        function update(deltaTime) {
+            if (game.state === GAME_STATE.URGENT_CHOICE) {
+                // 緊急選択中は時間が進む（プレッシャー）
+                if (game.pendingUrgent) {
+                    game.pendingUrgent.deadline -= deltaTime;
+                    if (game.pendingUrgent.deadline <= 0) {
+                        // 選択しなかった → 自動拒否
+                        rejectUrgent();
+                    }
+                }
+                return;
+            }
+            
+            if (game.state !== GAME_STATE.PLAYING) return;
+
+            // タイマー更新
+            game.timeLeft -= deltaTime;
+            if (game.hitCooldown > 0) game.hitCooldown -= deltaTime;
+            
+            // オーダー締切更新
+            if (game.currentOrder && !game.currentOrder.readyToShip) {
+                game.currentOrder.deadline -= deltaTime;
+                if (game.currentOrder.deadline <= 0) {
+                    addEventLog('⏰ オーダー期限切れ！-3秒', 'danger');
+                    triggerFlash('rgba(255, 150, 0, 0.3)', 0.3);
+                    game.timeLeft -= 3;
+                    playSound('wrong');
+                    startNewOrder();
+                }
+            }
+            
+            // 緊急オーダータイマー
+            game.urgentTimer -= deltaTime;
+            if (game.urgentTimer <= 0 && !game.pendingUrgent) {
+                triggerUrgentOrder();
+            }
+            
+            // エフェクト更新
+            if (game.flashEffect) {
+                game.flashEffect.timer -= deltaTime;
+                if (game.flashEffect.timer <= 0) game.flashEffect = null;
+            }
+            if (game.telopTimer > 0) {
+                game.telopTimer -= deltaTime;
+                if (game.telopTimer <= 0) game.telopText = null;
+            }
+            game.eventLog.forEach(log => log.time -= deltaTime);
+            game.eventLog = game.eventLog.filter(log => log.time > 0);
+            
+            // ゲームオーバーチェック
+            if (game.timeLeft <= 0) {
+                game.timeLeft = 0;
+                game.state = GAME_STATE.GAMEOVER;
+                stopBGM();
+                playSound('gameover');
+                startBtn.textContent = '🔄 リトライ';
+                startBtn.style.display = 'block';
+                return;
+            }
+
+            // ピッキング中は移動不可
+            if (player.isPicking) {
+                player.pickTimer -= deltaTime;
+                return;
+            }
+
+            // 移動
+            let dx = 0, dy = 0;
+            if (keys['ArrowUp'] || keys['KeyW'] || touchDirs.up) dy = -player.speed;
+            if (keys['ArrowDown'] || keys['KeyS'] || touchDirs.down) dy = player.speed;
+            if (keys['ArrowLeft'] || keys['KeyA'] || touchDirs.left) dx = -player.speed;
+            if (keys['ArrowRight'] || keys['KeyD'] || touchDirs.right) dx = player.speed;
+
+            if (dx !== 0 && dy !== 0) { dx *= 0.707; dy *= 0.707; }
+
+            if (dy < 0) player.direction = 'up';
+            else if (dy > 0) player.direction = 'down';
+            else if (dx < 0) player.direction = 'left';
+            else if (dx > 0) player.direction = 'right';
+
+            if (dx !== 0 || dy !== 0) {
+                player.animTimer += deltaTime;
+                if (player.animTimer > 0.08) {
+                    player.animTimer = 0;
+                    player.animFrame = (player.animFrame + 1) % 4;
+                }
+            } else {
+                player.animFrame = 0;
+            }
+
+            let newX = player.x + dx;
+            let newY = player.y + dy;
+            newX = Math.max(10, Math.min(MAP_WIDTH - player.width - 10, newX));
+            newY = Math.max(80, Math.min(MAP_HEIGHT - player.height - 10, newY));
+
+            if (!checkShelfCollision(newX, player.y)) player.x = newX;
+            if (!checkShelfCollision(player.x, newY)) player.y = newY;
+
+            updateCamera();
+            updateForklifts(deltaTime);
+            checkForkliftCollision();
+        }
+
+        // ============================================
+        // 描画
+        // ============================================
+
+        function draw() {
+            ctx.fillStyle = '#f5f5dc';
+            ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+            if (game.state === GAME_STATE.TITLE) {
+                drawTitle();
+            } else {
+                drawGame();
+                if (game.state === GAME_STATE.URGENT_CHOICE) {
+                    drawUrgentChoice();
+                }
+                if (game.state === GAME_STATE.GAMEOVER) {
+                    drawGameOver();
+                }
+            }
+        }
+
+        function drawTitle() {
+            const gradient = ctx.createLinearGradient(0, 0, 0, SCREEN_HEIGHT);
+            gradient.addColorStop(0, '#1a1a3e');
+            gradient.addColorStop(1, '#2a2a5e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+            // タイトル
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 38px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('🏭 倉庫ピッキング Pro', SCREEN_WIDTH/2, 50);
+
+            // 左パネル：遊び方
+            const leftX = 40;
+            const panelWidth = 420;
+            
+            // パネル背景
+            ctx.fillStyle = 'rgba(255,255,255,0.08)';
+            ctx.fillRect(leftX, 75, panelWidth, 250);
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(leftX, 75, panelWidth, 250);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('📖 遊び方', leftX + 15, 100);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '15px sans-serif';
+            const howToPlay = [
+                '① オーダーに書かれた商品を集める',
+                '   → 棚の前で SPACE を押してピック',
+                '',
+                '② 全部集めたら出荷口へ運ぶ',
+                '   → 出荷口の前で SPACE を押して納品',
+                '',
+                '③ 締切時間内に納品すると高得点！',
+                '   → 残り時間が多いほどボーナス'
+            ];
+            howToPlay.forEach((text, i) => {
+                ctx.fillStyle = text.startsWith('①') || text.startsWith('②') || text.startsWith('③') ? '#4CAF50' : '#ccc';
+                ctx.fillText(text, leftX + 15, 130 + i * 22);
+            });
+
+            // 右パネル：操作方法
+            const rightX = 490;
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.08)';
+            ctx.fillRect(rightX, 75, panelWidth, 250);
+            ctx.strokeStyle = '#ffd700';
+            ctx.strokeRect(rightX, 75, panelWidth, 250);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.fillText('🎮 操作方法', rightX + 15, 100);
+            
+            ctx.font = '15px sans-serif';
+            const controls = [
+                { key: '↑↓←→ / WASD', action: '移動' },
+                { key: 'SPACE', action: '棚でピック / 出荷口で納品' },
+                { key: 'Y / N', action: '緊急オーダーの受諾/拒否' },
+                { key: 'M', action: 'BGM ON/OFF' }
+            ];
+            controls.forEach((c, i) => {
+                const y = 130 + i * 40;
+                ctx.fillStyle = '#ffd700';
+                ctx.fillText(c.key, rightX + 15, y);
+                ctx.fillStyle = '#fff';
+                ctx.fillText(c.action, rightX + 15, y + 18);
+            });
+
+            // 下部：緊急オーダーとペナルティ
+            const bottomY = 340;
+            
+            // 緊急オーダー説明
+            ctx.fillStyle = 'rgba(180, 40, 40, 0.3)';
+            ctx.fillRect(leftX, bottomY, 440, 100);
+            ctx.strokeStyle = '#FF6B6B';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(leftX, bottomY, 440, 100);
+            
+            ctx.fillStyle = '#FF6B6B';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText('🚨 緊急オーダー（ランダムで割り込み）', leftX + 15, bottomY + 25);
+            
+            ctx.font = '14px sans-serif';
+            ctx.fillStyle = '#fff';
+            ctx.fillText('Y で受ける → 今のを破棄して緊急処理', leftX + 25, bottomY + 50);
+            ctx.fillText('              高得点 & 時間+10秒！', leftX + 25, bottomY + 68);
+            ctx.fillStyle = '#aaa';
+            ctx.fillText('N で無視 → 現オーダー続行（-5秒ペナルティ）', leftX + 25, bottomY + 90);
+
+            // 注意事項
+            ctx.fillStyle = 'rgba(255, 150, 0, 0.2)';
+            ctx.fillRect(rightX, bottomY, 420, 100);
+            ctx.strokeStyle = '#FFA500';
+            ctx.strokeRect(rightX, bottomY, 420, 100);
+            
+            ctx.fillStyle = '#FFA500';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText('⚠️ 注意', rightX + 15, bottomY + 25);
+            
+            ctx.font = '14px sans-serif';
+            ctx.fillStyle = '#fff';
+            ctx.fillText('🚜 フォークリフトに接触 → -5秒', rightX + 25, bottomY + 50);
+            ctx.fillText('⏰ オーダー締切切れ → -3秒', rightX + 25, bottomY + 70);
+            ctx.fillText('❌ 間違った商品をピック → 取れない', rightX + 25, bottomY + 90);
+
+            // 商品一覧（小さく）
+            ctx.fillStyle = '#888';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('【取扱商品】', SCREEN_WIDTH/2, 460);
+            
+            ITEM_TYPES.forEach((item, i) => {
+                const x = SCREEN_WIDTH/2 - 210 + i * 62;
+                const y = 485;
+                ctx.fillStyle = item.color;
+                ctx.beginPath();
+                ctx.arc(x, y, 16, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.font = '18px sans-serif';
+                ctx.fillText(item.emoji, x, y + 6);
+            });
+
+            // スタートボタン
+            if (Math.floor(Date.now() / 500) % 2 === 0) {
+                ctx.fillStyle = '#ffd700';
+                ctx.font = 'bold 28px sans-serif';
+                ctx.fillText('🎮 SPACE でスタート 🎮', SCREEN_WIDTH/2, 555);
+            } else {
+                ctx.fillStyle = '#aa9500';
+                ctx.font = 'bold 28px sans-serif';
+                ctx.fillText('🎮 SPACE でスタート 🎮', SCREEN_WIDTH/2, 555);
+            }
+        }
+
+        function drawGame() {
+            ctx.save();
+            ctx.translate(-game.cameraX, -game.cameraY);
+
+            drawFloor();
+            drawShippingStation();
+            game.shelves.forEach(s => drawShelf(s));
+            game.forklifts.forEach(f => drawForklift(f));
+            drawPlayer();
+
+            ctx.restore();
+
+            drawUI();
+            drawEventLog();
+            drawTelop();
+            drawFlashEffect();
+        }
+
+        function drawFloor() {
+            const tileSize = 100;
+            for (let x = 0; x < MAP_WIDTH; x += tileSize) {
+                for (let y = 0; y < MAP_HEIGHT; y += tileSize) {
+                    ctx.fillStyle = (Math.floor(x / tileSize) + Math.floor(y / tileSize)) % 2 === 0 
+                        ? '#e8e0c8' : '#ddd8c0';
+                    ctx.fillRect(x, y, tileSize, tileSize);
+                }
+            }
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([20, 12]);
+            for (let x = 240; x < MAP_WIDTH; x += 260) {
+                ctx.beginPath();
+                ctx.moveTo(x - 40, 100);
+                ctx.lineTo(x - 40, MAP_HEIGHT - 150);
+                ctx.stroke();
+            }
+            ctx.setLineDash([]);
+        }
+
+        function drawShippingStation() {
+            const s = game.shippingStation;
+            
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.fillRect(s.x + 5, s.y + 5, s.width, s.height);
+            
+            ctx.fillStyle = '#2E7D32';
+            ctx.fillRect(s.x, s.y, s.width, s.height);
+            ctx.strokeStyle = '#1B5E20';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(s.x, s.y, s.width, s.height);
+            
+            ctx.fillStyle = '#FFD700';
+            for (let i = 0; i < 4; i++) {
+                ctx.fillRect(s.x + 10 + i * 40, s.y, 15, s.height);
+            }
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('🚚 出荷口', s.x + s.width/2, s.y + s.height/2 + 6);
+        }
+
+        function drawShelf(shelf) {
+            const type = ITEM_TYPES[shelf.itemType];
+            const order = game.currentOrder;
+            const isNeeded = order && !order.readyToShip && 
+                             order.items.some(item => item.type === shelf.itemType && item.collected < item.required);
+            
+            ctx.fillStyle = 'rgba(0,0,0,0.15)';
+            ctx.fillRect(shelf.x + 5, shelf.y + 5, shelf.width, shelf.height);
+
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(shelf.x, shelf.y, shelf.width, shelf.height);
+            
+            ctx.fillStyle = '#A0522D';
+            for (let i = 0; i < 3; i++) {
+                ctx.fillRect(shelf.x, shelf.y + i * 22, shelf.width, 7);
+            }
+            
+            ctx.strokeStyle = isNeeded ? '#00FF00' : '#5D3A1A';
+            ctx.lineWidth = isNeeded ? 4 : 2;
+            ctx.strokeRect(shelf.x, shelf.y, shelf.width, shelf.height);
+
+            ctx.fillStyle = type.color;
+            ctx.fillRect(shelf.x + shelf.width/2 - 28, shelf.y - 38, 56, 34);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(shelf.x + shelf.width/2 - 28, shelf.y - 38, 56, 34);
+            
+            ctx.font = '26px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(type.emoji, shelf.x + shelf.width/2, shelf.y - 21);
+            
+            if (isNeeded && Math.floor(Date.now() / 400) % 2 === 0) {
+                ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+                ctx.fillRect(shelf.x - 5, shelf.y - 5, shelf.width + 10, shelf.height + 10);
+            }
+        }
+
+        function drawForklift(fl) {
+            const x = fl.x, y = fl.y;
+            
+            ctx.fillStyle = 'rgba(0,0,0,0.25)';
+            ctx.beginPath();
+            ctx.ellipse(x + 22, y + fl.height + 4, 25, 9, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#FF8C00';
+            ctx.fillRect(x + 5, y + 18, 35, 32);
+            ctx.fillStyle = '#FFB347';
+            ctx.fillRect(x + 7, y + 4, 30, 18);
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(x + 10, y + 7, 24, 11);
+            ctx.fillStyle = '#555';
+            ctx.fillRect(x, y + 50, 45, 7);
+            ctx.fillRect(x + 4, y + 45, 7, 18);
+            ctx.fillRect(x + 34, y + 45, 7, 18);
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(x + 11, y + 56, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + 34, y + 56, 7, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = Math.floor(Date.now() / 250) % 2 === 0 ? '#FF0000' : '#FF6666';
+            ctx.beginPath();
+            ctx.arc(x + 22, y - 2, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawPlayer() {
+            const x = Math.floor(player.x);
+            const y = Math.floor(player.y);
+
+            if (game.hitCooldown > 0 && Math.floor(Date.now() / 100) % 2 === 0) {
+                ctx.globalAlpha = 0.4;
+            }
+            if (player.isPicking) {
+                ctx.globalAlpha = 0.7;
+            }
+
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.beginPath();
+            ctx.ellipse(x + player.width/2, y + player.height + 2, 18, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = player.isPicking ? '#FFA500' : '#2196F3';
+            ctx.fillRect(x + 8, y + 20, 24, 24);
+            ctx.fillStyle = '#FFCC80';
+            ctx.beginPath();
+            ctx.arc(x + 20, y + 13, 13, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#FF5722';
+            ctx.beginPath();
+            ctx.arc(x + 20, y + 9, 14, Math.PI, 0);
+            ctx.fill();
+            ctx.fillRect(x + 4, y + 8, 32, 5);
+
+            ctx.fillStyle = '#1565C0';
+            const legOffset = Math.sin(player.animFrame * Math.PI / 2) * 4;
+            ctx.fillRect(x + 8, y + 42, 9, 8 + legOffset);
+            ctx.fillRect(x + 23, y + 42, 9, 8 - legOffset);
+
+            ctx.fillStyle = '#333';
+            if (player.direction === 'down') {
+                ctx.fillRect(x + 14, y + 11, 3, 3);
+                ctx.fillRect(x + 23, y + 11, 3, 3);
+            } else if (player.direction === 'left') {
+                ctx.fillRect(x + 10, y + 11, 3, 3);
+            } else if (player.direction === 'right') {
+                ctx.fillRect(x + 27, y + 11, 3, 3);
+            }
+
+            if (player.inventory.length > 0) {
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.beginPath();
+                ctx.arc(x + 35, y + 5, 12, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.font = 'bold 14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#333';
+                ctx.fillText(player.inventory.length.toString(), x + 35, y + 10);
+            }
+
+            ctx.globalAlpha = 1;
+        }
+
+        function drawUI() {
+            // 上部UI
+            ctx.fillStyle = 'rgba(20, 30, 60, 0.95)';
+            ctx.fillRect(0, 0, SCREEN_WIDTH, 95);
+            ctx.fillStyle = '#ffd700';
+            ctx.fillRect(0, 93, SCREEN_WIDTH, 3);
+
+            // スコア・レベル
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 15px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('SCORE', 12, 16);
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 22px sans-serif';
+            ctx.fillText(game.score.toLocaleString(), 12, 40);
+            ctx.fillStyle = '#FF8C00';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillText(`Lv.${game.level}`, 12, 58);
+            ctx.fillStyle = '#4CAF50';
+            ctx.fillText(`✅${game.completedOrders}件`, 55, 58);
+            
+            // コンボ表示
+            if (game.comboCount > 1) {
+                ctx.fillStyle = '#FF69B4';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText(`${game.comboCount}コンボ!`, 12, 75);
+            }
+
+            // 残り時間
+            const timeColor = game.timeLeft <= 15 ? '#FF5252' : '#ffd700';
+            ctx.fillStyle = timeColor;
+            ctx.textAlign = 'right';
+            ctx.font = 'bold 32px sans-serif';
+            ctx.fillText('⏱' + Math.ceil(game.timeLeft), SCREEN_WIDTH - 12, 40);
+
+            // オーダー表示
+            drawOrder();
+
+            // アクションヒント
+            drawActionHint();
+
+            // ミニマップ
+            drawMinimap();
+        }
+
+        function drawOrder() {
+            const order = game.currentOrder;
+            if (!order) return;
+            
+            const x = 140;
+            const isUrgent = order.type === ORDER_TYPE.URGENT;
+            const orderWidth = Math.min(order.items.length * 65 + 100, 500);
+            
+            // 背景
+            ctx.fillStyle = isUrgent 
+                ? 'rgba(180, 40, 40, 0.9)' 
+                : 'rgba(40, 80, 160, 0.9)';
+            ctx.fillRect(x, 5, orderWidth, 85);
+            
+            // 緊急の場合は点滅枠
+            if (isUrgent && Math.floor(Date.now() / 300) % 2 === 0) {
+                ctx.strokeStyle = '#FF0000';
+                ctx.lineWidth = 4;
+            } else {
+                ctx.strokeStyle = isUrgent ? '#FF6B6B' : '#6B9FFF';
+                ctx.lineWidth = 2;
+            }
+            ctx.strokeRect(x, 5, orderWidth, 85);
+            
+            // タイプラベル
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(isUrgent ? '🔴 緊急オーダー' : '🔵 通常オーダー', x + 8, 20);
+            
+            // 締切
+            const deadlineColor = order.deadline <= 5 ? '#FF0000' : (order.deadline <= 10 ? '#FFA500' : '#fff');
+            ctx.fillStyle = deadlineColor;
+            ctx.font = 'bold 14px sans-serif';
+            ctx.textAlign = 'right';
+            if (order.readyToShip) {
+                ctx.fillStyle = '#00FF00';
+                ctx.fillText('📦 納品待ち!', x + orderWidth - 8, 20);
+            } else {
+                ctx.fillText(`残${Math.ceil(order.deadline)}秒`, x + orderWidth - 8, 20);
+            }
+            
+            // アイテムリスト
+            const itemStartX = x + 10;
+            order.items.forEach((item, i) => {
+                const type = ITEM_TYPES[item.type];
+                const ix = itemStartX + i * 62;
+                const done = item.collected >= item.required;
+                
+                ctx.fillStyle = done ? 'rgba(76, 175, 80, 0.8)' : 'rgba(40, 40, 60, 0.8)';
+                ctx.fillRect(ix, 28, 58, 55);
+                ctx.strokeStyle = done ? '#4CAF50' : '#555';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(ix, 28, 58, 55);
+                
+                ctx.font = '24px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(type.emoji, ix + 22, 55);
+                
+                ctx.font = 'bold 15px sans-serif';
+                ctx.fillStyle = done ? '#fff' : '#ffd700';
+                ctx.fillText(`${item.collected}/${item.required}`, ix + 42, 75);
+                
+                if (done) {
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 14px sans-serif';
+                    ctx.fillText('✓', ix + 50, 40);
+                }
+            });
+        }
+
+        function drawActionHint() {
+            let hint = '';
+            let color = '#aaa';
+            
+            if (player.isPicking) {
+                hint = '📦 ピッキング中...';
+                color = '#FFA500';
+            } else if (isNearShippingStation()) {
+                const order = game.currentOrder;
+                if (order && order.readyToShip) {
+                    hint = '🚚 SPACEで納品！';
+                    color = '#00FF00';
+                } else {
+                    hint = '出荷口（ピック完了後に納品）';
+                    color = '#888';
+                }
+            } else {
+                const nearShelf = findNearShelf();
+                if (nearShelf) {
+                    hint = `📦 SPACE: ${ITEM_TYPES[nearShelf.itemType].emoji} をピック`;
+                    color = '#4CAF50';
+                }
+            }
+            
+            if (hint) {
+                ctx.fillStyle = color;
+                ctx.font = 'bold 14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(hint, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 12);
+            }
+            
+            // スマホ用ボタンテキスト更新
+            if (isNearShippingStation() && game.currentOrder?.readyToShip) {
+                actionBtn.innerHTML = '🚚<br>納品';
+            } else {
+                actionBtn.innerHTML = '📦<br>ピック';
+            }
+        }
+
+        function drawEventLog() {
+            const x = SCREEN_WIDTH - 195;
+            let y = 108;
+            
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'left';
+            
+            game.eventLog.forEach(log => {
+                const alpha = Math.min(1, log.time);
+                ctx.globalAlpha = alpha;
+                
+                switch (log.type) {
+                    case 'success': ctx.fillStyle = '#4CAF50'; break;
+                    case 'error': case 'danger': ctx.fillStyle = '#FF5252'; break;
+                    case 'warning': ctx.fillStyle = '#FFA500'; break;
+                    case 'urgent': ctx.fillStyle = '#FF6B6B'; break;
+                    case 'levelup': ctx.fillStyle = '#FFD700'; break;
+                    default: ctx.fillStyle = '#fff';
+                }
+                
+                ctx.fillText(log.text, x, y);
+                y += 16;
+            });
+            
+            ctx.globalAlpha = 1;
+        }
+
+        function drawTelop() {
+            if (!game.telopText) return;
+            
+            const alpha = Math.min(1, game.telopTimer);
+            ctx.globalAlpha = alpha;
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+            ctx.fillRect(0, SCREEN_HEIGHT / 2 - 35, SCREEN_WIDTH, 70);
+            
+            ctx.fillStyle = '#FFD700';
+            ctx.font = 'bold 30px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(game.telopText, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 10);
+            
+            ctx.globalAlpha = 1;
+        }
+
+        function drawFlashEffect() {
+            if (!game.flashEffect) return;
+            
+            const alpha = (game.flashEffect.timer / game.flashEffect.duration) * 0.6;
+            ctx.fillStyle = game.flashEffect.color.replace(/[\d.]+\)$/, alpha + ')');
+            ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        }
+
+        function drawUrgentChoice() {
+            // 暗転
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            
+            // 緊急オーダー表示
+            const urgent = game.pendingUrgent;
+            if (!urgent) return;
+            
+            ctx.fillStyle = 'rgba(150, 30, 30, 0.95)';
+            ctx.fillRect(SCREEN_WIDTH/2 - 250, 150, 500, 280);
+            ctx.strokeStyle = '#FF0000';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(SCREEN_WIDTH/2 - 250, 150, 500, 280);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 28px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('🚨 緊急オーダー割り込み！', SCREEN_WIDTH/2, 195);
+            
+            // 締切カウントダウン
+            ctx.fillStyle = '#FF6B6B';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.fillText(`選択まで残り ${Math.ceil(urgent.deadline)}秒`, SCREEN_WIDTH/2, 225);
+            
+            // アイテムリスト
+            const itemStartX = SCREEN_WIDTH/2 - (urgent.items.length * 35);
+            urgent.items.forEach((item, i) => {
+                const type = ITEM_TYPES[item.type];
+                const ix = itemStartX + i * 70;
+                
+                ctx.fillStyle = type.color;
+                ctx.beginPath();
+                ctx.arc(ix + 30, 280, 28, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.font = '30px sans-serif';
+                ctx.fillText(type.emoji, ix + 30, 290);
+                ctx.font = 'bold 14px sans-serif';
+                ctx.fillStyle = '#fff';
+                ctx.fillText(`x${item.required}`, ix + 30, 320);
+            });
+            
+            // 選択肢
+            ctx.fillStyle = '#fff';
+            ctx.font = '16px sans-serif';
+            ctx.fillText('受ける：今のオーダーを破棄、高得点チャンス', SCREEN_WIDTH/2, 365);
+            ctx.fillText('無視：現オーダー続行、ただし-5秒ペナルティ', SCREEN_WIDTH/2, 390);
+            
+            ctx.font = 'bold 20px sans-serif';
+            ctx.fillStyle = '#FF6B6B';
+            ctx.fillText('Y : 緊急を受ける', SCREEN_WIDTH/2 - 100, 420);
+            ctx.fillStyle = '#888';
+            ctx.fillText('N : 無視して続行', SCREEN_WIDTH/2 + 100, 420);
+        }
+
+        function drawMinimap() {
+            const mapX = SCREEN_WIDTH - 108;
+            const mapY = SCREEN_HEIGHT - 108;
+            const mapW = 98;
+            const mapH = 98;
+            const scaleX = mapW / MAP_WIDTH;
+            const scaleY = mapH / MAP_HEIGHT;
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(mapX - 4, mapY - 4, mapW + 8, mapH + 8);
+            ctx.fillStyle = '#ddd';
+            ctx.fillRect(mapX, mapY, mapW, mapH);
+
+            // 棚
+            ctx.fillStyle = '#8B4513';
+            game.shelves.forEach(shelf => {
+                ctx.fillRect(mapX + shelf.x * scaleX, mapY + shelf.y * scaleY,
+                    Math.max(shelf.width * scaleX, 2), Math.max(shelf.height * scaleY, 2));
+            });
+
+            // 出荷ステーション
+            ctx.fillStyle = '#2E7D32';
+            const s = game.shippingStation;
+            ctx.fillRect(mapX + s.x * scaleX, mapY + s.y * scaleY, s.width * scaleX, s.height * scaleY);
+
+            // フォークリフト
+            ctx.fillStyle = '#FF8C00';
+            game.forklifts.forEach(fl => {
+                ctx.fillRect(mapX + fl.x * scaleX - 2, mapY + fl.y * scaleY - 2, 4, 4);
+            });
+
+            // 必要な棚
+            const order = game.currentOrder;
+            if (order && !order.readyToShip) {
+                ctx.fillStyle = '#00FF00';
+                game.shelves.forEach(shelf => {
+                    const needed = order.items.some(item => 
+                        item.type === shelf.itemType && item.collected < item.required);
+                    if (needed) {
+                        ctx.fillRect(mapX + shelf.x * scaleX - 1, mapY + shelf.y * scaleY - 1,
+                            shelf.width * scaleX + 2, shelf.height * scaleY + 2);
+                    }
+                });
+            }
+
+            // プレイヤー
+            ctx.fillStyle = '#2196F3';
+            ctx.beginPath();
+            ctx.arc(mapX + (player.x + player.width/2) * scaleX,
+                    mapY + (player.y + player.height/2) * scaleY, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        }
+
+        function drawGameOver() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+            ctx.fillRect(0, 95, SCREEN_WIDTH, SCREEN_HEIGHT - 95);
+
+            ctx.fillStyle = '#FF5252';
+            ctx.font = 'bold 46px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('TIME UP!', SCREEN_WIDTH/2, 190);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '22px sans-serif';
+            ctx.fillText('スコア: ' + game.score.toLocaleString(), SCREEN_WIDTH/2, 250);
+            ctx.fillText(`完了: ${game.completedOrders}件（緊急${game.urgentCompleted}件）`, SCREEN_WIDTH/2, 285);
+            ctx.fillText('到達レベル: ' + game.level, SCREEN_WIDTH/2, 320);
+            
+            if (game.urgentMissed > 0) {
+                ctx.fillStyle = '#FF6B6B';
+                ctx.font = '16px sans-serif';
+                ctx.fillText(`緊急拒否: ${game.urgentMissed}回`, SCREEN_WIDTH/2, 350);
+            }
+
+            let rank = '🥉 ブロンズ';
+            let rankColor = '#CD7F32';
+            if (game.score >= 35000) { rank = '🏆 マスター'; rankColor = '#FFD700'; }
+            else if (game.score >= 25000) { rank = '🥇 ゴールド'; rankColor = '#FFD700'; }
+            else if (game.score >= 15000) { rank = '🥈 シルバー'; rankColor = '#C0C0C0'; }
+            
+            ctx.fillStyle = rankColor;
+            ctx.font = 'bold 32px sans-serif';
+            ctx.fillText(rank, SCREEN_WIDTH/2, 410);
+
+            if (Math.floor(Date.now() / 500) % 2 === 0) {
+                ctx.fillStyle = '#ffd700';
+                ctx.font = 'bold 22px sans-serif';
+                ctx.fillText('🎮 SPACE でリトライ 🎮', SCREEN_WIDTH/2, 500);
+            }
+        }
+
+        // ============================================
+        // ゲームループ
+        // ============================================
+
+        function gameLoop(timestamp) {
+            const deltaTime = (timestamp - game.lastTime) / 1000;
+            game.lastTime = timestamp;
+            update(Math.min(deltaTime, 0.1));
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        game.lastTime = performance.now();
+        requestAnimationFrame(gameLoop);
+        setTimeout(() => canvas.focus(), 100);
+
+    </script>
+</body>
+</html>
