@@ -18,25 +18,26 @@
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             font-family: 'Segoe UI', 'Hiragino Sans', sans-serif;
             overflow: hidden;
             touch-action: none;
+            padding-top: 5px;
         }
         
         .game-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
-            max-width: 100vw;
-            max-height: 100vh;
+            gap: 3px;
+            width: 100%;
+            max-width: 960px;
         }
         
         h1 {
             color: #ffd700;
-            font-size: 24px;
+            font-size: 20px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
         
@@ -46,8 +47,9 @@
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
             cursor: pointer;
             outline: none;
-            max-width: 100%;
-            max-height: 55vh;
+            width: 100%;
+            max-width: 960px;
+            height: auto;
         }
         
         .controls {
@@ -64,10 +66,10 @@
         .virtual-controls {
             display: none;
             position: fixed;
-            bottom: 10px;
+            bottom: 8px;
             left: 0;
             right: 0;
-            padding: 0 15px;
+            padding: 0 10px;
         }
         
         .control-row {
@@ -78,21 +80,21 @@
         
         .dpad {
             position: relative;
-            width: 130px;
-            height: 130px;
+            width: 120px;
+            height: 120px;
         }
         
         .dpad-btn {
             position: absolute;
-            width: 44px;
-            height: 44px;
-            background: rgba(255, 215, 0, 0.7);
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 215, 0, 0.8);
             border: 2px solid #ffd700;
             border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
+            font-size: 18px;
             color: #1a1a2e;
             font-weight: bold;
             touch-action: none;
@@ -120,15 +122,15 @@
         }
         
         .action-btn {
-            width: 80px;
-            height: 80px;
+            width: 75px;
+            height: 75px;
             background: linear-gradient(145deg, #4CAF50, #2E7D32);
             border: 3px solid #81C784;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 14px;
+            font-size: 13px;
             color: #fff;
             font-weight: bold;
             text-align: center;
@@ -146,13 +148,14 @@
             bottom: 50%;
             left: 50%;
             transform: translate(-50%, 50%);
-            gap: 20px;
+            gap: 15px;
             z-index: 200;
+            flex-direction: column;
         }
         
         .urgent-choice-btn {
-            padding: 20px 30px;
-            font-size: 18px;
+            padding: 18px 35px;
+            font-size: 16px;
             font-weight: bold;
             border: none;
             border-radius: 10px;
@@ -172,14 +175,14 @@
         
         .start-btn {
             position: fixed;
-            bottom: 180px;
+            bottom: 160px;
             left: 50%;
             transform: translateX(-50%);
             padding: 15px 40px;
             background: #ffd700;
             border: none;
             border-radius: 10px;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             color: #1a1a2e;
             display: none;
@@ -188,18 +191,19 @@
         
         .sound-toggle {
             position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 8px 12px;
+            top: 8px;
+            right: 8px;
+            padding: 6px 10px;
             background: rgba(255, 215, 0, 0.8);
             border: none;
             border-radius: 8px;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             z-index: 100;
         }
         
-        @media (max-width: 950px) {
+        /* スマホ横向き・縦向き両対応 */
+        @media (max-width: 960px) {
             .virtual-controls, .start-btn {
                 display: flex;
             }
@@ -209,15 +213,78 @@
             h1 {
                 font-size: 16px;
             }
-            #gameCanvas {
-                max-height: 45vh;
+            body {
+                padding-top: 2px;
+            }
+        }
+        
+        /* スマホ縦向き */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 14px;
+            }
+            .dpad {
+                width: 100px;
+                height: 100px;
+            }
+            .dpad-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+            .action-btn {
+                width: 65px;
+                height: 65px;
+                font-size: 12px;
+            }
+            .virtual-controls {
+                bottom: 5px;
+            }
+            .start-btn {
+                bottom: 130px;
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+            .urgent-btns {
+                gap: 10px;
+            }
+            .urgent-choice-btn {
+                padding: 14px 25px;
+                font-size: 14px;
+            }
+        }
+        
+        /* 横向きスマホ */
+        @media (max-height: 500px) {
+            h1 {
+                display: none;
+            }
+            body {
+                padding-top: 0;
+            }
+            .virtual-controls {
+                bottom: 3px;
+            }
+            .dpad {
+                width: 90px;
+                height: 90px;
+            }
+            .dpad-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            .action-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 11px;
             }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h1>🏭 倉庫ピッキング</h1>
+        <h1>🏭 倉庫ピッキングゲーム</h1>
         <canvas id="gameCanvas" tabindex="0"></canvas>
         <div class="controls">
             <span>↑↓←→/WASD</span>移動 | <span>SPACE</span>ピック/納品 | <span>M</span>BGM | 緊急時<span>Y/N</span>で選択
@@ -860,13 +927,52 @@
                     showTelop('⚠️ ヒヤリハット発生！ -5秒', 1.5);
                     addEventLog('⚠️ フォークリフト接触！-5秒', 'danger');
                     
+                    // 押し戻し方向を計算
                     const pushX = player.x - (fl.x + fl.width / 2);
                     const pushY = player.y - (fl.y + fl.height / 2);
                     const dist = Math.sqrt(pushX * pushX + pushY * pushY) || 1;
-                    player.x += (pushX / dist) * 60;
-                    player.y += (pushY / dist) * 60;
-                    player.x = Math.max(10, Math.min(MAP_WIDTH - player.width - 10, player.x));
-                    player.y = Math.max(100, Math.min(MAP_HEIGHT - player.height - 10, player.y));
+                    
+                    // 押し戻し先を計算
+                    let newX = player.x + (pushX / dist) * 60;
+                    let newY = player.y + (pushY / dist) * 60;
+                    
+                    // 境界内に収める
+                    newX = Math.max(10, Math.min(MAP_WIDTH - player.width - 10, newX));
+                    newY = Math.max(100, Math.min(MAP_HEIGHT - player.height - 10, newY));
+                    
+                    // 棚にめり込まないかチェック
+                    if (!checkShelfCollision(newX, newY)) {
+                        player.x = newX;
+                        player.y = newY;
+                    } else if (!checkShelfCollision(newX, player.y)) {
+                        // X方向だけ移動
+                        player.x = newX;
+                    } else if (!checkShelfCollision(player.x, newY)) {
+                        // Y方向だけ移動
+                        player.y = newY;
+                    } else {
+                        // どこにも動けない場合、安全な場所を探す
+                        const safeSpots = [
+                            { x: player.x + 80, y: player.y },
+                            { x: player.x - 80, y: player.y },
+                            { x: player.x, y: player.y + 80 },
+                            { x: player.x, y: player.y - 80 },
+                            { x: player.x + 80, y: player.y + 80 },
+                            { x: player.x - 80, y: player.y - 80 },
+                            { x: player.x + 80, y: player.y - 80 },
+                            { x: player.x - 80, y: player.y + 80 }
+                        ];
+                        
+                        for (let spot of safeSpots) {
+                            const sx = Math.max(10, Math.min(MAP_WIDTH - player.width - 10, spot.x));
+                            const sy = Math.max(100, Math.min(MAP_HEIGHT - player.height - 10, spot.y));
+                            if (!checkShelfCollision(sx, sy)) {
+                                player.x = sx;
+                                player.y = sy;
+                                break;
+                            }
+                        }
+                    }
                     return;
                 }
             }
@@ -1160,7 +1266,7 @@
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 38px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('🏭 倉庫ピッキング', SCREEN_WIDTH/2, 50);
+            ctx.fillText('🏭 倉庫ピッキングゲーム', SCREEN_WIDTH/2, 50);
 
             // 左パネル：遊び方
             const leftX = 40;
@@ -1851,5 +1957,4 @@
 
     </script>
 </body>
-
 </html>
