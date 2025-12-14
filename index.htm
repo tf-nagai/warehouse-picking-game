@@ -15,158 +15,40 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #1a1a2e;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             min-height: 100vh;
             min-height: 100dvh;
             font-family: 'Segoe UI', 'Hiragino Sans', sans-serif;
             overflow: hidden;
             touch-action: none;
-            padding: 5px;
         }
         
         .game-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 3px;
             width: 100%;
             height: 100%;
         }
         
-        h1 {
-            color: #ffd700;
-            font-size: clamp(14px, 3vw, 24px);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        
         #gameCanvas {
-            border: 3px solid #ffd700;
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            display: block;
             cursor: pointer;
             outline: none;
-            max-width: 100%;
-            max-height: 60vh;
-            width: auto;
-            height: auto;
-        }
-        
-        /* PCではキャンバスを大きく */
-        @media (min-width: 1024px) and (hover: hover) {
-            #gameCanvas {
-                max-height: 85vh;
-            }
-        }
-        
-        .controls {
-            color: #ccc;
-            font-size: clamp(10px, 1.5vw, 14px);
-            text-align: center;
-            padding: 5px;
-        }
-        
-        .controls span {
-            color: #ffd700;
-            font-weight: bold;
-        }
-
-        /* バーチャルコントロール（タッチデバイス用） */
-        .virtual-controls {
-            display: none;
-            position: fixed;
-            bottom: 10px;
-            left: 0;
-            right: 0;
-            padding: 0 15px;
-            z-index: 100;
-        }
-        
-        .control-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 100%;
-        }
-        
-        /* Dパッド - vwベースでレスポンシブ */
-        .dpad {
-            position: relative;
-            width: min(35vw, 250px);
-            height: min(35vw, 250px);
-        }
-        
-        .dpad-btn {
-            position: absolute;
-            width: 32%;
-            height: 32%;
-            background: rgba(255, 215, 0, 0.9);
-            border: 3px solid #ffd700;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: clamp(20px, 5vw, 36px);
-            color: #1a1a2e;
-            font-weight: bold;
             touch-action: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        
-        .dpad-btn:active, .dpad-btn.active {
-            background: #ffd700;
-            transform: scale(0.95);
-        }
-        
-        .dpad-up { top: 0; left: 50%; transform: translateX(-50%); }
-        .dpad-down { bottom: 0; left: 50%; transform: translateX(-50%); }
-        .dpad-left { left: 0; top: 50%; transform: translateY(-50%); }
-        .dpad-right { right: 0; top: 50%; transform: translateY(-50%); }
-        
-        .dpad-up:active, .dpad-up.active { transform: translateX(-50%) scale(0.95); }
-        .dpad-down:active, .dpad-down.active { transform: translateX(-50%) scale(0.95); }
-        .dpad-left:active, .dpad-left.active { transform: translateY(-50%) scale(0.95); }
-        .dpad-right:active, .dpad-right.active { transform: translateY(-50%) scale(0.95); }
-        
-        /* アクションボタン - vwベースでレスポンシブ */
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .action-btn {
-            width: min(30vw, 180px);
-            height: min(30vw, 180px);
-            background: linear-gradient(145deg, #4CAF50, #2E7D32);
-            border: 4px solid #81C784;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: clamp(16px, 4vw, 28px);
-            color: #fff;
-            font-weight: bold;
-            text-align: center;
-            touch-action: none;
-            box-shadow: 0 6px 25px rgba(76, 175, 80, 0.5);
-        }
-        
-        .action-btn:active, .action-btn.active {
-            transform: scale(0.95);
         }
         
         /* 緊急ボタン */
         .urgent-btns {
             display: none;
             position: fixed;
-            top: 58%;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            gap: clamp(15px, 4vw, 40px);
+            transform: translate(-50%, -50%);
+            gap: 20px;
             z-index: 200;
             flex-direction: row;
             flex-wrap: wrap;
@@ -175,8 +57,8 @@
         }
         
         .urgent-choice-btn {
-            padding: clamp(15px, 3vw, 22px) clamp(25px, 6vw, 45px);
-            font-size: clamp(16px, 2.5vw, 22px);
+            padding: 18px 35px;
+            font-size: 20px;
             font-weight: bold;
             border: none;
             border-radius: 12px;
@@ -194,7 +76,6 @@
         
         .accept-btn:hover, .accept-btn:active {
             background: linear-gradient(145deg, #FF6B6B, #E53935);
-            transform: scale(1.02);
         }
         
         .reject-btn {
@@ -205,191 +86,121 @@
         
         .reject-btn:hover, .reject-btn:active {
             background: linear-gradient(145deg, #777, #555);
-            transform: scale(1.02);
-        }
-        
-        /* スタートボタン */
-        .start-btn {
-            position: fixed;
-            bottom: calc(min(35vw, 250px) + 30px);
-            left: 50%;
-            transform: translateX(-50%);
-            padding: clamp(12px, 3vw, 20px) clamp(25px, 6vw, 50px);
-            background: #ffd700;
-            border: none;
-            border-radius: 15px;
-            font-size: clamp(16px, 3vw, 24px);
-            font-weight: bold;
-            color: #1a1a2e;
-            display: none;
-            touch-action: none;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-            z-index: 150;
         }
         
         .sound-toggle {
             position: fixed;
             top: 8px;
             right: 8px;
-            padding: clamp(4px, 1vw, 8px) clamp(6px, 1.5vw, 12px);
-            background: rgba(255, 215, 0, 0.8);
+            padding: 8px 12px;
+            background: rgba(255, 215, 0, 0.9);
             border: none;
             border-radius: 8px;
-            font-size: clamp(14px, 2vw, 18px);
+            font-size: 18px;
             cursor: pointer;
             z-index: 100;
         }
         
-        /* タッチデバイス検出 - ホバー不可 = タッチデバイス */
-        @media (hover: none) and (pointer: coarse) {
-            .virtual-controls, .start-btn {
-                display: flex;
-            }
-            .controls {
-                display: none;
-            }
-            #gameCanvas {
-                max-height: calc(100dvh - min(35vw, 250px) - 80px);
-            }
-        }
-        
-        /* PCでマウス操作 */
-        @media (hover: hover) and (pointer: fine) {
-            .virtual-controls, .start-btn {
-                display: none !important;
-            }
-            .controls {
-                display: block;
-            }
-            #gameCanvas {
-                max-height: 85vh;
-            }
-            body {
-                padding-top: 10px;
-            }
-        }
-        
-        /* 横向きスマホ */
-        @media (max-height: 500px) and (hover: none) {
-            h1 {
-                display: none;
-            }
-            body {
-                padding: 2px;
-            }
-            #gameCanvas {
-                max-height: calc(100dvh - min(25vw, 150px) - 20px);
-            }
-            .dpad {
-                width: min(25vw, 150px);
-                height: min(25vw, 150px);
-            }
-            .action-btn {
-                width: min(20vw, 120px);
-                height: min(20vw, 120px);
-            }
-            .start-btn {
-                bottom: calc(min(25vw, 150px) + 20px);
-            }
-            .urgent-btns {
-                top: 55%;
-            }
-        }
-        
-        /* 大きいタブレット横向き */
-        @media (min-width: 1024px) and (hover: none) {
-            .dpad {
-                width: 200px;
-                height: 200px;
-            }
-            .action-btn {
-                width: 150px;
-                height: 150px;
-            }
-            #gameCanvas {
-                max-height: calc(100dvh - 250px);
+        /* スマホ用の緊急ボタン調整 */
+        @media (max-width: 600px) {
+            .urgent-choice-btn {
+                padding: 15px 25px;
+                font-size: 16px;
             }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h1>🏭 倉庫ピッキングゲーム</h1>
         <canvas id="gameCanvas" tabindex="0"></canvas>
-        <div class="controls">
-            <span>↑↓←→/WASD</span>移動 | <span>SPACE</span>ピック/納品 | <span>M</span>BGM | 緊急時<span>Y/N</span>で選択
-        </div>
     </div>
     
     <button class="sound-toggle" id="soundToggle">🔊</button>
-    <button class="start-btn" id="startBtn">🎮 スタート</button>
     
     <div class="urgent-btns" id="urgentBtns">
         <button class="urgent-choice-btn accept-btn" id="acceptBtn">🚨 緊急を受ける (Y)</button>
         <button class="urgent-choice-btn reject-btn" id="rejectBtn">続行する (N)</button>
     </div>
-    
-    <div class="virtual-controls" id="virtualControls">
-        <div class="control-row">
-            <div class="dpad">
-                <div class="dpad-btn dpad-up" data-dir="up">▲</div>
-                <div class="dpad-btn dpad-down" data-dir="down">▼</div>
-                <div class="dpad-btn dpad-left" data-dir="left">◀</div>
-                <div class="dpad-btn dpad-right" data-dir="right">▶</div>
-            </div>
-            <div class="action-buttons">
-                <div class="action-btn" id="actionBtn">📦<br>ピック</div>
-            </div>
-        </div>
-    </div>
 
     <script>
+        // roundRect polyfill for older browsers
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2;
+                if (h < 2 * r) r = h / 2;
+                this.moveTo(x + r, y);
+                this.arcTo(x + w, y, x + w, y + h, r);
+                this.arcTo(x + w, y + h, x, y + h, r);
+                this.arcTo(x, y + h, x, y, r);
+                this.arcTo(x, y, x + w, y, r);
+                this.closePath();
+                return this;
+            };
+        }
+        
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const startBtn = document.getElementById('startBtn');
         const soundToggle = document.getElementById('soundToggle');
-        const actionBtn = document.getElementById('actionBtn');
         const urgentBtns = document.getElementById('urgentBtns');
         const acceptBtn = document.getElementById('acceptBtn');
         const rejectBtn = document.getElementById('rejectBtn');
 
-        // 画面・マップサイズ（内部解像度）
-        const SCREEN_WIDTH = 1200;
-        const SCREEN_HEIGHT = 750;
+        // ゲーム内部解像度
+        const GAME_WIDTH = 1200;
+        const GAME_HEIGHT = 750;
         const MAP_WIDTH = 2200;
         const MAP_HEIGHT = 1800;
         
-        // 高解像度対応
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = SCREEN_WIDTH * dpr;
-        canvas.height = SCREEN_HEIGHT * dpr;
-        ctx.scale(dpr, dpr);
+        // 実際の画面サイズ
+        let screenWidth, screenHeight, scale;
+        let isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         
-        // CSSでのサイズ調整（アスペクト比維持）
+        // バーチャルパッドの状態
+        const virtualPad = {
+            dpad: { x: 0, y: 0, size: 0, btnSize: 0 },
+            actionBtn: { x: 0, y: 0, size: 0 },
+            touching: { up: false, down: false, left: false, right: false, action: false }
+        };
+        
         function resizeCanvas() {
-            const aspectRatio = SCREEN_WIDTH / SCREEN_HEIGHT;
-            const maxWidth = window.innerWidth - 20;
-            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            const controlHeight = isTouchDevice ? Math.min(window.innerWidth * 0.35, 250) + 30 : 0;
-            const maxHeight = window.innerHeight - controlHeight - 60;
+            screenWidth = window.innerWidth;
+            screenHeight = window.innerHeight;
             
-            let width = maxWidth;
-            let height = width / aspectRatio;
+            canvas.width = screenWidth;
+            canvas.height = screenHeight;
+            canvas.style.width = screenWidth + 'px';
+            canvas.style.height = screenHeight + 'px';
             
-            if (height > maxHeight) {
-                height = maxHeight;
-                width = height * aspectRatio;
+            // ゲーム描画スケール計算
+            const scaleX = screenWidth / GAME_WIDTH;
+            const scaleY = screenHeight / GAME_HEIGHT;
+            scale = Math.min(scaleX, scaleY);
+            
+            // バーチャルパッドのサイズと位置を計算
+            if (isTouchDevice) {
+                const padSize = Math.min(screenWidth * 0.28, 180);
+                const btnSize = padSize * 0.35;
+                const margin = 20;
+                
+                virtualPad.dpad = {
+                    x: margin + padSize / 2,
+                    y: screenHeight - margin - padSize / 2,
+                    size: padSize,
+                    btnSize: btnSize
+                };
+                
+                const actionSize = Math.min(screenWidth * 0.22, 140);
+                virtualPad.actionBtn = {
+                    x: screenWidth - margin - actionSize / 2,
+                    y: screenHeight - margin - actionSize / 2,
+                    size: actionSize
+                };
             }
-            
-            canvas.style.width = width + 'px';
-            canvas.style.height = height + 'px';
         }
         
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('orientationchange', () => {
-            setTimeout(resizeCanvas, 100);
-        });
+        window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 100));
 
         // アイテムの種類
         const ITEM_TYPES = [
@@ -1063,10 +874,10 @@
         // ============================================
 
         function updateCamera() {
-            let targetX = player.x - SCREEN_WIDTH / 2 + player.width / 2;
-            let targetY = player.y - SCREEN_HEIGHT / 2 + player.height / 2;
-            targetX = Math.max(0, Math.min(MAP_WIDTH - SCREEN_WIDTH, targetX));
-            targetY = Math.max(0, Math.min(MAP_HEIGHT - SCREEN_HEIGHT, targetY));
+            let targetX = player.x - GAME_WIDTH / 2 + player.width / 2;
+            let targetY = player.y - GAME_HEIGHT / 2 + player.height / 2;
+            targetX = Math.max(0, Math.min(MAP_WIDTH - GAME_WIDTH, targetX));
+            targetY = Math.max(0, Math.min(MAP_HEIGHT - GAME_HEIGHT, targetY));
             game.cameraX += (targetX - game.cameraX) * 0.12;
             game.cameraY += (targetY - game.cameraY) * 0.12;
         }
@@ -1109,42 +920,141 @@
 
         window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
-        // タッチ操作
-        document.querySelectorAll('.dpad-btn').forEach(btn => {
-            const dir = btn.dataset.dir;
-            btn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                touchDirs[dir] = true;
-                btn.classList.add('active');
-            });
-            btn.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                touchDirs[dir] = false;
-                btn.classList.remove('active');
-            });
-            btn.addEventListener('touchcancel', () => {
-                touchDirs[dir] = false;
-                btn.classList.remove('active');
-            });
-        });
-
-        actionBtn.addEventListener('touchstart', (e) => {
+        // Canvasタッチ操作
+        function getTouchPos(touch) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: touch.clientX - rect.left,
+                y: touch.clientY - rect.top
+            };
+        }
+        
+        function checkDpadTouch(x, y) {
+            const pad = virtualPad.dpad;
+            const dist = Math.sqrt((x - pad.x) ** 2 + (y - pad.y) ** 2);
+            
+            if (dist > pad.size / 2 + 20) return null;
+            
+            // どの方向か判定
+            const angle = Math.atan2(y - pad.y, x - pad.x);
+            const deg = angle * 180 / Math.PI;
+            
+            if (deg >= -45 && deg < 45) return 'right';
+            if (deg >= 45 && deg < 135) return 'down';
+            if (deg >= -135 && deg < -45) return 'up';
+            return 'left';
+        }
+        
+        function checkActionTouch(x, y) {
+            const btn = virtualPad.actionBtn;
+            const dist = Math.sqrt((x - btn.x) ** 2 + (y - btn.y) ** 2);
+            return dist <= btn.size / 2 + 10;
+        }
+        
+        // タッチ開始のトラッキング用
+        let activeTouches = {};
+        
+        canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             initAudio();
-            if (game.state === GAME_STATE.PLAYING) tryPick();
-            actionBtn.classList.add('active');
+            
+            for (let touch of e.changedTouches) {
+                const pos = getTouchPos(touch);
+                const touchId = touch.identifier;
+                
+                // ゲーム画面タップ（タイトル/ゲームオーバー時）
+                if (game.state === GAME_STATE.TITLE || game.state === GAME_STATE.GAMEOVER) {
+                    startGame();
+                    return;
+                }
+                
+                if (!isTouchDevice) return;
+                
+                // Dパッドチェック
+                const dir = checkDpadTouch(pos.x, pos.y);
+                if (dir) {
+                    virtualPad.touching[dir] = true;
+                    touchDirs[dir] = true;
+                    activeTouches[touchId] = { type: 'dpad', dir };
+                    continue;
+                }
+                
+                // アクションボタンチェック
+                if (checkActionTouch(pos.x, pos.y)) {
+                    virtualPad.touching.action = true;
+                    activeTouches[touchId] = { type: 'action' };
+                    if (game.state === GAME_STATE.PLAYING) tryPick();
+                }
+            }
+        }, { passive: false });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            
+            for (let touch of e.changedTouches) {
+                const pos = getTouchPos(touch);
+                const touchId = touch.identifier;
+                const activeTouch = activeTouches[touchId];
+                
+                if (activeTouch && activeTouch.type === 'dpad') {
+                    // 現在の方向をリセット
+                    virtualPad.touching[activeTouch.dir] = false;
+                    touchDirs[activeTouch.dir] = false;
+                    
+                    // 新しい方向を検出
+                    const newDir = checkDpadTouch(pos.x, pos.y);
+                    if (newDir) {
+                        virtualPad.touching[newDir] = true;
+                        touchDirs[newDir] = true;
+                        activeTouches[touchId].dir = newDir;
+                    }
+                }
+            }
+        }, { passive: false });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            
+            for (let touch of e.changedTouches) {
+                const touchId = touch.identifier;
+                const activeTouch = activeTouches[touchId];
+                
+                if (activeTouch) {
+                    if (activeTouch.type === 'dpad') {
+                        virtualPad.touching[activeTouch.dir] = false;
+                        touchDirs[activeTouch.dir] = false;
+                    } else if (activeTouch.type === 'action') {
+                        virtualPad.touching.action = false;
+                    }
+                    delete activeTouches[touchId];
+                }
+            }
+        }, { passive: false });
+        
+        canvas.addEventListener('touchcancel', (e) => {
+            // 全タッチをリセット
+            Object.keys(virtualPad.touching).forEach(k => virtualPad.touching[k] = false);
+            Object.keys(touchDirs).forEach(k => touchDirs[k] = false);
+            activeTouches = {};
         });
-        actionBtn.addEventListener('touchend', () => actionBtn.classList.remove('active'));
 
+        // 緊急オーダーボタン
         acceptBtn.addEventListener('click', () => { if (game.state === GAME_STATE.URGENT_CHOICE) acceptUrgent(); });
         rejectBtn.addEventListener('click', () => { if (game.state === GAME_STATE.URGENT_CHOICE) rejectUrgent(); });
         acceptBtn.addEventListener('touchstart', (e) => { e.preventDefault(); if (game.state === GAME_STATE.URGENT_CHOICE) acceptUrgent(); });
         rejectBtn.addEventListener('touchstart', (e) => { e.preventDefault(); if (game.state === GAME_STATE.URGENT_CHOICE) rejectUrgent(); });
 
-        startBtn.addEventListener('click', () => { initAudio(); if (game.state !== GAME_STATE.PLAYING) startGame(); });
-        startBtn.addEventListener('touchstart', (e) => { e.preventDefault(); initAudio(); if (game.state !== GAME_STATE.PLAYING) startGame(); });
         soundToggle.addEventListener('click', () => { initAudio(); toggleBGM(); });
-        canvas.addEventListener('click', () => canvas.focus());
+        canvas.addEventListener('click', (e) => { 
+            canvas.focus(); 
+            initAudio();
+            // PC版でクリックでスタート/リトライ
+            if (!isTouchDevice) {
+                if (game.state === GAME_STATE.TITLE || game.state === GAME_STATE.GAMEOVER) {
+                    startGame();
+                }
+            }
+        });
 
         // ============================================
         // ゲーム開始
@@ -1175,8 +1085,8 @@
             startNewOrder();
             resetUrgentTimer();
             
-            game.cameraX = player.x - SCREEN_WIDTH / 2;
-            game.cameraY = player.y - SCREEN_HEIGHT / 2;
+            game.cameraX = player.x - GAME_WIDTH / 2;
+            game.cameraY = player.y - GAME_HEIGHT / 2;
             game.lastTime = performance.now();
             
             startBtn.style.display = 'none';
@@ -1299,8 +1209,25 @@
         // ============================================
 
         function draw() {
+            // 画面クリア
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, screenWidth, screenHeight);
+            
+            // ゲーム描画（スケーリング適用）
+            ctx.save();
+            
+            // 中央に配置
+            const gameDrawWidth = GAME_WIDTH * scale;
+            const gameDrawHeight = GAME_HEIGHT * scale;
+            const offsetX = (screenWidth - gameDrawWidth) / 2;
+            const offsetY = isTouchDevice ? 10 : (screenHeight - gameDrawHeight) / 2;
+            
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scale, scale);
+            
+            // ゲーム背景
             ctx.fillStyle = '#f5f5dc';
-            ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
             if (game.state === GAME_STATE.TITLE) {
                 drawTitle();
@@ -1313,20 +1240,103 @@
                     drawGameOver();
                 }
             }
+            
+            ctx.restore();
+            
+            // バーチャルパッド描画（スケーリングなし、画面座標）
+            if (isTouchDevice) {
+                drawVirtualPad();
+            }
+        }
+        
+        function drawVirtualPad() {
+            const pad = virtualPad.dpad;
+            const btn = virtualPad.actionBtn;
+            
+            // Dパッド背景
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.arc(pad.x, pad.y, pad.size / 2 + 10, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Dパッドボタン
+            const dirs = [
+                { dir: 'up', dx: 0, dy: -1 },
+                { dir: 'down', dx: 0, dy: 1 },
+                { dir: 'left', dx: -1, dy: 0 },
+                { dir: 'right', dx: 1, dy: 0 }
+            ];
+            
+            dirs.forEach(d => {
+                const bx = pad.x + d.dx * (pad.size / 2 - pad.btnSize / 2);
+                const by = pad.y + d.dy * (pad.size / 2 - pad.btnSize / 2);
+                
+                const isPressed = virtualPad.touching[d.dir];
+                ctx.fillStyle = isPressed ? '#ffd700' : 'rgba(255, 215, 0, 0.85)';
+                
+                // 角丸四角形
+                const r = 8;
+                const hw = pad.btnSize / 2;
+                ctx.beginPath();
+                ctx.roundRect(bx - hw, by - hw, pad.btnSize, pad.btnSize, r);
+                ctx.fill();
+                
+                ctx.strokeStyle = '#ffd700';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // 矢印
+                ctx.fillStyle = '#1a1a2e';
+                ctx.font = `bold ${pad.btnSize * 0.5}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const arrows = { up: '▲', down: '▼', left: '◀', right: '▶' };
+                ctx.fillText(arrows[d.dir], bx, by);
+            });
+            
+            // アクションボタン背景
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.arc(btn.x, btn.y, btn.size / 2 + 10, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // アクションボタン
+            const isActionPressed = virtualPad.touching.action;
+            const gradient = ctx.createRadialGradient(btn.x, btn.y - 10, 0, btn.x, btn.y, btn.size / 2);
+            gradient.addColorStop(0, isActionPressed ? '#66BB6A' : '#4CAF50');
+            gradient.addColorStop(1, isActionPressed ? '#388E3C' : '#2E7D32');
+            ctx.fillStyle = gradient;
+            
+            ctx.beginPath();
+            ctx.arc(btn.x, btn.y, btn.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#81C784';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            
+            // ボタンラベル
+            ctx.fillStyle = '#fff';
+            ctx.font = `bold ${btn.size * 0.18}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('📦', btn.x, btn.y - btn.size * 0.12);
+            ctx.font = `bold ${btn.size * 0.14}px sans-serif`;
+            ctx.fillText('ピック', btn.x, btn.y + btn.size * 0.18);
         }
 
         function drawTitle() {
-            const gradient = ctx.createLinearGradient(0, 0, 0, SCREEN_HEIGHT);
+            const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
             gradient.addColorStop(0, '#1a1a3e');
             gradient.addColorStop(1, '#2a2a5e');
             ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
             // タイトル
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 48px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('🏭 倉庫ピッキングゲーム', SCREEN_WIDTH/2, 60);
+            ctx.fillText('🏭 倉庫ピッキングゲーム', GAME_WIDTH/2, 60);
 
             // 左パネル：遊び方
             const leftX = 50;
@@ -1358,6 +1368,10 @@
             ];
             howToPlay.forEach((text, i) => {
                 ctx.fillStyle = text.startsWith('①') || text.startsWith('②') || text.startsWith('③') ? '#4CAF50' : '#ccc';
+                // スマホ用にSPACEをピックボタンに変更
+                if (isTouchDevice) {
+                    text = text.replace('SPACE', 'ピックボタン');
+                }
                 ctx.fillText(text, leftX + 20, 160 + i * 26);
             });
 
@@ -1374,7 +1388,11 @@
             ctx.fillText('🎮 操作方法', rightX + 20, 125);
             
             ctx.font = '18px sans-serif';
-            const controls = [
+            const controls = isTouchDevice ? [
+                { key: '左の十字パッド', action: '移動' },
+                { key: '右のピックボタン', action: '棚でピック / 出荷口で納品' },
+                { key: '画面のボタン', action: '緊急オーダーの受諾/拒否' }
+            ] : [
                 { key: '↑↓←→ / WASD', action: '移動' },
                 { key: 'SPACE', action: '棚でピック / 出荷口で納品' },
                 { key: 'Y / N', action: '緊急オーダーの受諾/拒否' },
@@ -1404,10 +1422,12 @@
             
             ctx.font = '16px sans-serif';
             ctx.fillStyle = '#fff';
-            ctx.fillText('Y で受ける → 今のを破棄して緊急処理', leftX + 30, bottomY + 60);
+            const acceptKey = isTouchDevice ? '「受ける」ボタン' : 'Y';
+            const rejectKey = isTouchDevice ? '「続行」ボタン' : 'N';
+            ctx.fillText(`${acceptKey} で受ける → 今のを破棄して緊急処理`, leftX + 30, bottomY + 60);
             ctx.fillText('              高得点 & 時間+10秒！', leftX + 30, bottomY + 82);
             ctx.fillStyle = '#aaa';
-            ctx.fillText('N で無視 → 現オーダー続行（-5秒ペナルティ）', leftX + 30, bottomY + 108);
+            ctx.fillText(`${rejectKey} で無視 → 現オーダー続行（-5秒ペナルティ）`, leftX + 30, bottomY + 108);
 
             // 注意事項
             ctx.fillStyle = 'rgba(255, 150, 0, 0.2)';
@@ -1429,10 +1449,10 @@
             ctx.fillStyle = '#888';
             ctx.font = '14px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('【取扱商品】', SCREEN_WIDTH/2, 540);
+            ctx.fillText('【取扱商品】', GAME_WIDTH/2, 540);
             
             ITEM_TYPES.forEach((item, i) => {
-                const x = SCREEN_WIDTH/2 - 240 + i * 72;
+                const x = GAME_WIDTH/2 - 240 + i * 72;
                 const y = 575;
                 ctx.fillStyle = item.color;
                 ctx.beginPath();
@@ -1443,14 +1463,22 @@
             });
 
             // スタートボタン
+            const startText = isTouchDevice ? '👆 タップでスタート 👆' : '🎮 SPACE でスタート 🎮';
             if (Math.floor(Date.now() / 500) % 2 === 0) {
                 ctx.fillStyle = '#ffd700';
                 ctx.font = 'bold 34px sans-serif';
-                ctx.fillText('🎮 SPACE でスタート 🎮', SCREEN_WIDTH/2, 680);
+                ctx.fillText(startText, GAME_WIDTH/2, 680);
             } else {
                 ctx.fillStyle = '#aa9500';
                 ctx.font = 'bold 34px sans-serif';
-                ctx.fillText('🎮 SPACE でスタート 🎮', SCREEN_WIDTH/2, 680);
+                ctx.fillText(startText, GAME_WIDTH/2, 680);
+            }
+            
+            // 操作ヒント（PC版）
+            if (!isTouchDevice) {
+                ctx.fillStyle = '#888';
+                ctx.font = '14px sans-serif';
+                ctx.fillText('↑↓←→/WASD: 移動 | SPACE: ピック/納品 | M: BGM | 緊急時 Y/N: 選択', GAME_WIDTH/2, 720);
             }
         }
 
@@ -1673,9 +1701,9 @@
         function drawUI() {
             // 上部UI
             ctx.fillStyle = 'rgba(20, 30, 60, 0.95)';
-            ctx.fillRect(0, 0, SCREEN_WIDTH, 110);
+            ctx.fillRect(0, 0, GAME_WIDTH, 110);
             ctx.fillStyle = '#ffd700';
-            ctx.fillRect(0, 108, SCREEN_WIDTH, 3);
+            ctx.fillRect(0, 108, GAME_WIDTH, 3);
 
             // スコア・レベル
             ctx.fillStyle = '#fff';
@@ -1703,7 +1731,7 @@
             ctx.fillStyle = timeColor;
             ctx.textAlign = 'right';
             ctx.font = 'bold 38px sans-serif';
-            ctx.fillText('⏱' + Math.ceil(game.timeLeft), SCREEN_WIDTH - 15, 50);
+            ctx.fillText('⏱' + Math.ceil(game.timeLeft), GAME_WIDTH - 15, 50);
 
             // オーダー表示
             drawOrder();
@@ -1814,7 +1842,7 @@
                 ctx.fillStyle = color;
                 ctx.font = 'bold 16px sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText(hint, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 15);
+                ctx.fillText(hint, GAME_WIDTH / 2, GAME_HEIGHT - 15);
             }
             
             // スマホ用ボタンテキスト更新
@@ -1826,7 +1854,7 @@
         }
 
         function drawEventLog() {
-            const x = SCREEN_WIDTH - 220;
+            const x = GAME_WIDTH - 220;
             let y = 125;
             
             ctx.font = '14px sans-serif';
@@ -1859,12 +1887,12 @@
             ctx.globalAlpha = alpha;
             
             ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-            ctx.fillRect(0, SCREEN_HEIGHT / 2 - 45, SCREEN_WIDTH, 90);
+            ctx.fillRect(0, GAME_HEIGHT / 2 - 45, GAME_WIDTH, 90);
             
             ctx.fillStyle = '#FFD700';
             ctx.font = 'bold 36px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(game.telopText, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 12);
+            ctx.fillText(game.telopText, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 12);
             
             ctx.globalAlpha = 1;
         }
@@ -1874,13 +1902,13 @@
             
             const alpha = (game.flashEffect.timer / game.flashEffect.duration) * 0.6;
             ctx.fillStyle = game.flashEffect.color.replace(/[\d.]+\)$/, alpha + ')');
-            ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
         }
 
         function drawUrgentChoice() {
             // 暗転
             ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-            ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
             
             // 緊急オーダー表示
             const urgent = game.pendingUrgent;
@@ -1888,7 +1916,7 @@
             
             const panelW = 600;
             const panelH = 260;
-            const panelX = SCREEN_WIDTH/2 - panelW/2;
+            const panelX = GAME_WIDTH/2 - panelW/2;
             const panelY = 140;
             
             ctx.fillStyle = 'rgba(150, 30, 30, 0.95)';
@@ -1901,15 +1929,15 @@
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 32px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('🚨 緊急オーダー割り込み！', SCREEN_WIDTH/2, panelY + 40);
+            ctx.fillText('🚨 緊急オーダー割り込み！', GAME_WIDTH/2, panelY + 40);
             
             // 締切カウントダウン
             ctx.fillStyle = '#FFD700';
             ctx.font = 'bold 22px sans-serif';
-            ctx.fillText(`選択まで残り ${Math.ceil(urgent.deadline)}秒`, SCREEN_WIDTH/2, panelY + 72);
+            ctx.fillText(`選択まで残り ${Math.ceil(urgent.deadline)}秒`, GAME_WIDTH/2, panelY + 72);
             
             // アイテムリスト
-            const itemStartX = SCREEN_WIDTH/2 - (urgent.items.length * 50);
+            const itemStartX = GAME_WIDTH/2 - (urgent.items.length * 50);
             urgent.items.forEach((item, i) => {
                 const type = ITEM_TYPES[item.type];
                 const ix = itemStartX + i * 100;
@@ -1931,14 +1959,14 @@
             // 説明テキスト（パネル内に収める）
             ctx.fillStyle = '#4CAF50';
             ctx.font = 'bold 15px sans-serif';
-            ctx.fillText('Y：受ける → 高得点 ＆ 時間+10秒', SCREEN_WIDTH/2, panelY + 230);
+            ctx.fillText('Y：受ける → 高得点 ＆ 時間+10秒', GAME_WIDTH/2, panelY + 230);
             ctx.fillStyle = '#aaa';
-            ctx.fillText('N：無視 → 現オーダー続行（-5秒）', SCREEN_WIDTH/2, panelY + 250);
+            ctx.fillText('N：無視 → 現オーダー続行（-5秒）', GAME_WIDTH/2, panelY + 250);
         }
 
         function drawMinimap() {
-            const mapX = SCREEN_WIDTH - 130;
-            const mapY = SCREEN_HEIGHT - 130;
+            const mapX = GAME_WIDTH - 130;
+            const mapY = GAME_HEIGHT - 130;
             const mapW = 120;
             const mapH = 115;
             const scaleX = mapW / MAP_WIDTH;
@@ -1994,23 +2022,23 @@
 
         function drawGameOver() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-            ctx.fillRect(0, 110, SCREEN_WIDTH, SCREEN_HEIGHT - 110);
+            ctx.fillRect(0, 110, GAME_WIDTH, GAME_HEIGHT - 110);
 
             ctx.fillStyle = '#FF5252';
             ctx.font = 'bold 56px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('TIME UP!', SCREEN_WIDTH/2, 230);
+            ctx.fillText('TIME UP!', GAME_WIDTH/2, 230);
 
             ctx.fillStyle = '#fff';
             ctx.font = '28px sans-serif';
-            ctx.fillText('スコア: ' + game.score.toLocaleString(), SCREEN_WIDTH/2, 310);
-            ctx.fillText(`完了: ${game.completedOrders}件（緊急${game.urgentCompleted}件）`, SCREEN_WIDTH/2, 355);
-            ctx.fillText('到達レベル: ' + game.level, SCREEN_WIDTH/2, 400);
+            ctx.fillText('スコア: ' + game.score.toLocaleString(), GAME_WIDTH/2, 310);
+            ctx.fillText(`完了: ${game.completedOrders}件（緊急${game.urgentCompleted}件）`, GAME_WIDTH/2, 355);
+            ctx.fillText('到達レベル: ' + game.level, GAME_WIDTH/2, 400);
             
             if (game.urgentMissed > 0) {
                 ctx.fillStyle = '#FF6B6B';
                 ctx.font = '20px sans-serif';
-                ctx.fillText(`緊急拒否: ${game.urgentMissed}回`, SCREEN_WIDTH/2, 440);
+                ctx.fillText(`緊急拒否: ${game.urgentMissed}回`, GAME_WIDTH/2, 440);
             }
 
             let rank = '🥉 ブロンズ';
@@ -2021,12 +2049,13 @@
             
             ctx.fillStyle = rankColor;
             ctx.font = 'bold 40px sans-serif';
-            ctx.fillText(rank, SCREEN_WIDTH/2, 510);
+            ctx.fillText(rank, GAME_WIDTH/2, 510);
 
+            const retryText = isTouchDevice ? '👆 タップでリトライ 👆' : '🎮 SPACE でリトライ 🎮';
             if (Math.floor(Date.now() / 500) % 2 === 0) {
                 ctx.fillStyle = '#ffd700';
                 ctx.font = 'bold 28px sans-serif';
-                ctx.fillText('🎮 SPACE でリトライ 🎮', SCREEN_WIDTH/2, 620);
+                ctx.fillText(retryText, GAME_WIDTH/2, 620);
             }
         }
 
